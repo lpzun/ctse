@@ -125,43 +125,7 @@ string width(const T& x, cushort& width) {
 	}
 	return result;
 }
-/**
- * @brief Convert object x into a string, padded with fill character as necessary to achieve target width.
- * 		stringstream::operator<< must be defined for object x. If width = 0, just return string version of x
- *
- * @param x
- * @param width
- * @param c
- * @param fill
- * @return
- */
-//template<class T>
-//string widthify(const T& x, cushort& width, const Alignment& c, const char& fill) {
-//	std::ostringstream os;
-//	os << x;
-//	string s = os.str();
-//
-//	ushort n = s.size();
-//	if (n >= width)
-//		return s;
-//	ushort addlength = width - n;
-//	string result;
-//	switch (c) {
-//	case LEFTJUST:
-//		result = s + string(addlength, fill);
-//		break;
-//	case RIGHTJUST:
-//		result = string(addlength, fill) + s;
-//		break;
-//	case CENTERED:
-//		result = (
-//				addlength % 2 == 0 ?
-//						string(addlength / 2, fill) + s + string(addlength / 2, fill) :
-//						string((addlength - 1) / 2, fill) + s + string((addlength + 1) / 2, fill));
-//		break;
-//	}
-//	return result;
-//}
+
 /**
  * @brief Output string s, but with <sep> inserted as tabulator every tab character. Never at left or right
  * 		end of s. Never if either left or right neighbor of tabulator position is ' '
