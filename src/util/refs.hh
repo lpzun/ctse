@@ -9,10 +9,10 @@
 #define REFS_HH_
 
 #include "state.hh"
-#include "graph.hh"
+
 namespace sura {
 
-typedef unsigned int vertex;
+using adj_list = map<Thread_State, deque<Thread_State>>;
 
 class Refs {
 public:
@@ -34,19 +34,11 @@ public:
 
 	static ushort TARGET_THR_NUM;
 
-//	static string FILE_NAME_PREFIX;
-
 	static Thread_State INITL_TS;
 	static Thread_State FINAL_TS;
 
 	static adj_list original_TTD;
 	static adj_list spawntra_TTD;
-
-	static vector<Thread_State> mapping_TS;
-	static map<Thread_State, id_thread_state> activee_TS;
-
-	static uint INITL_N;
-	static uint SPAWN_Z;
 
 	/// global variable for elapsed time
 	static clock_t ELAPSED_TIME;

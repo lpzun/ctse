@@ -42,12 +42,6 @@ Thread_State Refs::FINAL_TS;
 adj_list Refs::original_TTD;
 adj_list Refs::spawntra_TTD;
 
-vector<Thread_State> Refs::mapping_TS;
-map<Thread_State, id_thread_state> Refs::activee_TS;
-
 clock_t Refs::ELAPSED_TIME = clock();
-
-uint Refs::INITL_N = 1;
-uint Refs::SPAWN_Z = 0;
 
 } /* namespace SURA */

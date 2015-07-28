@@ -25,12 +25,10 @@
 
 #include <iostream>
 
-#include "sura/fws/fws.hh"
-
 #include "util/cmd.hh"
 #include "util/refs.hh"
 
-#include "sura/sura.hh"
+#include "tse/ura.hh"
 
 using namespace sura;
 using namespace std;
@@ -65,31 +63,15 @@ int main(const int argc, const char * const * const argv) {
 		Refs::OPT_CONSTRAINT = cmd.arg_bool(OTHER_OPTS, "--cstr");
 
 		if (cmd.arg_bool(OTHER_OPTS, "--cmd-line") || Refs::OPT_PRINT_ALL) {
-			// TODO do something
 		}
+
 		const string& filename = cmd.arg_value(PROB_INST_OPTS, "--input-file");
-		//Refs::FILE_NAME_PREFIX = filename.substr(0, filename.find_last_of("."));
-		const string& s_initl = cmd.arg_value(PROB_INST_OPTS, "--initial");
-		const string& s_final = cmd.arg_value(PROB_INST_OPTS, "--target");
+		const string& initl_ts = cmd.arg_value(PROB_INST_OPTS, "--initial");
+		const string& final_ts = cmd.arg_value(PROB_INST_OPTS, "--target");
 
-		// SMT_SOLVER = cmd.arg_value(PROB_INST_OPTS, "--smt-solver");
-
-		bool is_reachable = false;
-		const string& mode = cmd.arg_value(EXP_MODE_OPTS, "--mode");
-		if (mode.compare(OPT_MODE_LDP) == 0) { /// logic decision algorithm
-			Sura ursula;
-			is_reachable = ursula.symbolic_reachability_analysis(filename,
-					s_initl, s_final);
-			cout << "logical decision analysis is done! " << "\n";
-		} else if (mode.compare(OPT_MODE_FWS) == 0) { /// forward search alg.
-			cout << "forward search is done! " << "\n";
-		} else if (mode.compare(OPT_MODE_CON) == 0) { /// concurrent LDP&FWS
-			cout << "forward search join ... " << "\n";
-			cout << "logical decision analysis join ... " << "\n";
-		} else {
-			throw ural_rt_err("main: unknown mode");
-		}
-
+		ura u;
+		const bool& is_reachable = u.unbounded_reachability_analysis(filename,
+				initl_ts, final_ts);
 		cout << "======================================================\n";
 		cout << " " << Refs::FINAL_TS;
 		if (is_reachable)
