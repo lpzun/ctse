@@ -42,32 +42,31 @@ using namespace std;
  */
 int main(const int argc, const char * const * const argv) {
 	try {
-		Cmd_Line cmd = CMD::create_argument_list();
+		cmd_line cmd;
 		try {
 			cmd.get_command_line(argc, argv);
-		} catch (Cmd_Line::Help) {
+		} catch (cmd_line::Help) {
 			return 0;
 		}
 
-		Refs::OPT_PRINT_DOT = cmd.arg_bool(PROB_INST_OPTS, "--ettd2dot");
-		Refs::OPT_PRINT_ADJ = cmd.arg_bool(PROB_INST_OPTS, "--adj-list");
+		Refs::OPT_PRINT_DOT = cmd.arg_bool(cmd_line::prob_inst_opts(),
+				"--ettd2dot");
+		Refs::OPT_PRINT_ADJ = cmd.arg_bool(cmd_line::prob_inst_opts(),
+				"--adj-list");
 
-		Refs::OPT_PRINT_PATH = cmd.arg_bool(EXP_MODE_OPTS, "--path");
-		Refs::IS_BWS_TREE = cmd.arg_bool(EXP_MODE_OPTS, "--bwstree");
-		Refs::OPT_COMPLETE = cmd.arg_bool(EXP_MODE_OPTS, "--complete");
-		Refs::OPT_BACKWARD = cmd.arg_bool(EXP_MODE_OPTS, "--backward");
-		Refs::OPT_SHARED = cmd.arg_bool(EXP_MODE_OPTS, "--shared");
+		Refs::OPT_CONSTRAINT = cmd.arg_bool(cmd_line::exp_mode_opts(), "--cstr");
+		Refs::OPT_PRINT_ALL = cmd.arg_bool(cmd_line::other_opts(), "--all");
 
-		Refs::OPT_NOT_SIMPLE = cmd.arg_bool(OTHER_OPTS, "--nosimpl");
-		Refs::OPT_PRINT_ALL = cmd.arg_bool(OTHER_OPTS, "--all");
-		Refs::OPT_CONSTRAINT = cmd.arg_bool(OTHER_OPTS, "--cstr");
-
-		if (cmd.arg_bool(OTHER_OPTS, "--cmd-line") || Refs::OPT_PRINT_ALL) {
+		if (cmd.arg_bool(cmd_line::other_opts(), "--cmd-line")
+				|| Refs::OPT_PRINT_ALL) {
 		}
 
-		const string& filename = cmd.arg_value(PROB_INST_OPTS, "--input-file");
-		const string& initl_ts = cmd.arg_value(PROB_INST_OPTS, "--initial");
-		const string& final_ts = cmd.arg_value(PROB_INST_OPTS, "--target");
+		const string& filename = cmd.arg_value(cmd_line::prob_inst_opts(),
+				"--input-file");
+		const string& initl_ts = cmd.arg_value(cmd_line::prob_inst_opts(),
+				"--initial");
+		const string& final_ts = cmd.arg_value(cmd_line::prob_inst_opts(),
+				"--target");
 
 		ura u;
 		const bool& is_reachable = u.unbounded_reachability_analysis(filename,

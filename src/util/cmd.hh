@@ -15,6 +15,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
+#include <memory>
 
 #include "algs.hh"
 
@@ -25,8 +26,7 @@ using std::list;
 using std::vector;
 using std::cout;
 using std::endl;
-
-extern string v_info;
+using std::unique_ptr;
 
 class Arguments {
 public:
@@ -141,47 +141,20 @@ inline bool operator<(const Switch& arg1, const Switch& arg2) {
 	return (arg1.get_long_name() < arg2.get_long_name());
 }
 
-#define DEFAULT_OPTS 0
-#define PROB_INST_OPTS 1
-#define EXP_MODE_OPTS 2
-#define SMT_SOLVER_OPTS 3
-#define OTHER_OPTS 3
-
-#define OPTS_TYPES 4
-
-#define SHORT_HELP_OPT "-h"
-#define LONG_HELP_OPT "--help"
-#define SHORT_VERSION_OPT "-v"
-#define LONG_VERSION_OPT "--version"
-
-const string VERSION = "v1.0";
-
-const string OPT_MODE_FWS = "F";
-const string OPT_MODE_LDP = "S";
-const string OPT_MODE_CON = "L";
-
-class Cmd_Line {
+class cmd_line {
 public:
-	Cmd_Line();
-	virtual ~Cmd_Line();
+
+//	static Cmd_Line& instance();
+
+	cmd_line();
+	virtual ~cmd_line();
 
 	struct Help {
 	};
 
-	void add_option(const short& type, const string& short_name,
-			const string& long_name, const string& meaning,
-			const string& default_value);
-	void add_switch(const short& type, const string& short_name,
-			const string& long_name, const string& meaning);
-
-	void get_command_line(const int argc, const char* const * const argv); // args supplied as by main
-	void get_command_line(const string& prog, const vector<string>& args);
-
-	bool arg_bool(const short& type, const string& arg);
+	void get_command_line(const int argc, const char* const * const argv);
+	bool arg_bool(const unsigned short& type, const string& arg);
 	string arg_value(const short& type, const string& arg);
-
-	void print_usage_info(const string& prog_name, cushort& indent = 1,
-			ostream& out = cout) const;
 
 	const vector<string>& get_types() const {
 		return types;
@@ -191,18 +164,67 @@ public:
 		this->types = types;
 	}
 
+	inline static unsigned short opts_types() {
+		static unsigned short OPTS_TYPES = 4;
+		return OPTS_TYPES;
+	}
+
+	inline static unsigned short default_opts() {
+		static unsigned short DEFAULT_OPTS = 0;
+		return DEFAULT_OPTS;
+	}
+
+	inline static unsigned short prob_inst_opts() {
+		static unsigned short PROB_INST_OPTS = 1;
+		return PROB_INST_OPTS;
+	}
+
+	inline static unsigned short exp_mode_opts() {
+		static unsigned short EXP_MODE_OPTS = 2;
+		return EXP_MODE_OPTS;
+	}
+
+	inline static unsigned short smt_solver_opts() {
+		static unsigned short SMT_SOLVER_OPTS = 4;
+		return SMT_SOLVER_OPTS;
+	}
+
+	inline static unsigned short other_opts() {
+		static unsigned short OTHER_OPTS = 3;
+		return OTHER_OPTS;
+	}
+
 private:
+	string SHORT_HELP_OPT;
+	string LONG_HELP_OPT;
+	string SHORT_VERSION_OPT;
+	string LONG_VERSION_OPT;
+
+	string VERSION;
+
+	ushort name_width;
+	const string help_message;
+	string v_info;
+
 	map<short, deque<Options>> options;
 	map<short, deque<Switch>> switches;
 	vector<string> types;
-	static ushort name_width;
-	static const string help_message;
-};
 
-namespace CMD {
-Cmd_Line create_argument_list();
-string create_version_info();
-}
-;
+//	static unique_ptr<Cmd_Line> m_instance;
+
+	void create_argument_list();
+	string create_version_info();
+
+	void add_option(const short& type, const string& short_name,
+			const string& long_name, const string& meaning,
+			const string& default_value);
+	void add_switch(const short& type, const string& short_name,
+			const string& long_name, const string& meaning);
+
+	void get_command_line(const string& prog, const vector<string>& args);
+
+	void print_usage_info(const string& prog_name, cushort& indent = 1,
+			ostream& out = cout) const;
+};
 
 #endif /* CMD_HH_ */
