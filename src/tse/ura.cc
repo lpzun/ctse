@@ -29,8 +29,7 @@ bool ura::unbounded_reachability_analysis(const string& filename,
 		const string& s_initl, const string& s_final) {
 	Refs::INITL_TS = this->parse_input_tss(s_initl);
 	Refs::FINAL_TS = this->parse_input_tss(s_final);
-	this->parse_input_ttd(filename);
-	return false;
+	return this->reachability_analysis_via_tse(filename);
 }
 
 /**
@@ -59,7 +58,7 @@ Thread_State ura::parse_input_tss(const string& str_ts) {
  * @brief parse the input TTD
  * @param filename: the name of input .ttd file
  */
-void ura::parse_input_ttd(const string& filename) {
+bool ura::reachability_analysis_via_tse(const string& filename) {
 	if (filename == "X") { // make random structure
 		throw ural_rt_err("Please assign the input file!");
 	} else {
@@ -88,6 +87,7 @@ void ura::parse_input_ttd(const string& filename) {
 		vector<inout> s_in_out(Thread_State::S);
 
 		id_tran transition_ID = 0;  /// define unique transition ID
+		deque<id_tran> spawn_vars;
 
 		Shared_State s1, s2;              /// shared states
 		Local_State l1, l2;               /// local  states
@@ -111,8 +111,10 @@ void ura::parse_input_ttd(const string& filename) {
 					s_in_out[s2].first.emplace_back(transition_ID);
 				}
 
-				if (sep == "+>")
+				if (sep == "+>") {
 					Refs::spawntra_TTD[src_TS].emplace_back(dst_TS);
+					spawn_vars.emplace_back(transition_ID);
+				}
 				Refs::original_TTD[src_TS].emplace_back(dst_TS);
 
 				transition_ID++; /// increment unique transition ID
@@ -159,6 +161,9 @@ void ura::parse_input_ttd(const string& filename) {
 			Util::print_adj_list(Refs::original_TTD);
 			cout << endl;
 		}
+
+		tse t(transition_ID, spawn_vars);
+		return t.reachability_analysis_via_tse(l_in_out, s_in_out);
 	}
 }
 

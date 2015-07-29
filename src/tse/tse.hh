@@ -28,7 +28,7 @@ enum class result {
 
 class tse {
 public:
-	tse(const id_tran &size_R);
+	tse(const id_tran &size_R, const deque<id_tran>& spawns);
 	virtual ~tse();
 	bool reachability_analysis_via_tse(const vector<inout>& l_in_out,
 			const vector<inout>& s_in_out);

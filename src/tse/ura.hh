@@ -23,9 +23,7 @@ public:
 
 private:
 	Thread_State parse_input_tss(const string& str_ts);
-	void parse_input_ttd(const string& filename);
-
-	bool reachability_analysis_via_tse();
+	bool reachability_analysis_via_tse(const string& filename);
 };
 
 } /* namespace sura */

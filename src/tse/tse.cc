@@ -9,20 +9,39 @@
 
 namespace sura {
 
-tse::tse(const id_tran &size_R) :
+tse::tse(const id_tran &size_R, const deque<id_tran>& spawns) :
 		ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(
 				ctx.int_val(0)), max_n(0), max_z(0), s_solver(
 				(tactic(ctx, "simplify") & tactic(ctx, "qe")
 						& tactic(ctx, "smt")).mk_solver()) {
-
+	/// set up the expression of summarizing all spawn variables
+	for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
+		const id_tran& id = *iv;
+		sum_z = sum_z + ctx.int_const((x_affix + std::to_string(id)).c_str());
+	}
 }
 
 tse::~tse() {
 }
 
+/**
+ * @brief determine the reachability of FINAL_TS via TSE
+ * @param l_in_out
+ * @param s_in_out
+ * @return bool
+ * 		true : if reachable
+ * 		false: otherwise
+ */
 bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out,
 		const vector<inout>& s_in_out) {
-
+	switch (this->solicit_for_TSE(l_in_out, s_in_out)) {
+	case result::reach:
+		return true;
+	case result::unreach:
+		return false;
+	default: /// unknown
+		return this->solicit_for_CEGAR();
+	}
 }
 
 /**
@@ -33,6 +52,8 @@ bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out,
  */
 result tse::solicit_for_TSE(const vector<inout>& l_in_out,
 		const vector<inout>& s_in_out) {
+	/// add n_0 >= 1
+	s_solver.add(n_0 >= 1);
 
 	/// add x_i >= 0
 	for (uint idx = 0; idx < x_index; ++idx)
@@ -41,13 +62,16 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out,
 
 	/// add C_L constraints
 	const auto& c_L = this->build_CL(l_in_out);
-	for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
-		s_solver.add(*iphi);
+	for (size_t i = 0; i != c_L.size(); ++i)
+		if (i == Refs::FINAL_TS.get_local())
+			s_solver.add(c_L[i] >= 1);
+		else
+			s_solver.add(c_L[i] >= 0);
 
 	/// add C_S constraints
 	const auto& c_S = this->build_CS(s_in_out);
-	for (auto iphi = c_S.begin(); iphi != c_S.end(); ++iphi)
-		s_solver.add(*iphi);
+	for (size_t i = 0; i != c_S.size(); ++i)
+		s_solver.add(c_S[i] == 0);
 
 #ifndef NDEBUG
 	for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
@@ -109,6 +133,10 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
 	return phi;
 }
 
+/**
+ * @brief parse the sat solution and update max_n & max_z
+ * @return void
+ */
 result tse::check_sat_via_smt_solver() {
 	switch (s_solver.check()) {
 	case sat:
@@ -123,7 +151,15 @@ result tse::check_sat_via_smt_solver() {
 	}
 }
 
+/**
+ * @brief parse the sat solution and see if max_n or max_z is updated
+ * @param m: the solution returned from z3 SMT solver
+ */
 void tse::parse_sat_solution(const model& m) {
+#ifndef NDEBUG
+	cout << __func__ << "\n";
+	cout << m << endl;
+#endif
 	for (size_t i = 0; i < m.size(); i++) {
 		func_decl v = m[i];
 		assert(v.arity() == 0); /// check if contains only constants
@@ -149,6 +185,12 @@ uint tse::get_z3_const_uint(const expr& e) {
 	}
 }
 
+/**
+ * @brief solicit for CEGAR to refine pathwise encoding
+ * @return bool
+ * 		true : if we find a witness path,
+ * 		false: otherwise
+ */
 bool tse::solicit_for_CEGAR() {
 	while (true) { /// CEGAR loop might never terminate
 		/// add incremental constraint
@@ -169,6 +211,16 @@ bool tse::solicit_for_CEGAR() {
 	return false;
 }
 
+/**
+ * @brief  This procedure checks the reachability of final thread state with
+ * 		fixed number of threads, i.e., if there exists a path tau_0 ->* tau_F
+ * 		s.t. tau_F covers final.
+ * @param n: # of initial   threads
+ * @param z: # of spawn transitions
+ * @return bool
+ * 		true : if there is a witness path
+ * 		false: otherwise
+ */
 bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 	auto spw = z;
 //	cout << "===============================" << spw << endl;
@@ -179,36 +231,37 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 		Global_State tau = W.front();
 		W.pop();
 		const ushort &shared = tau.get_share();
-		for (auto il = tau.locals.begin(); il != tau.locals.end(); ++il) {
+		for (auto il = tau.get_locals().begin(); il != tau.get_locals().end();
+				++il) {
 			Thread_State src(shared, il->first);
 			if (src != Refs::FINAL_TS) {
 				auto ifind = Refs::original_TTD.find(src);
 				if (ifind != Refs::original_TTD.end()) {
 					for (auto idst = ifind->second.begin();
 							idst != ifind->second.end(); ++idst) {
-						auto locals = tau.locals;
+						auto locals = tau.get_locals();
 						if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
 							if (spw > 0) {
 								spw--;
-//								cout << "=============" << idst->local << endl;
 								locals = this->update_counter(locals,
-										idst->local);
+										idst->get_local());
 							} else { /// if the we already spawn z times, we can't
 								continue; /// spawn any more and have to skip src +> dst;
 							}
 						} else {
-							locals = this->update_counter(locals, src.local,
-									idst->local);
+							locals = this->update_counter(locals,
+									src.get_local(), idst->get_local());
 						}
 						Global_State _tau(idst->get_share(), locals);
 						if (R.insert(_tau).second) {
-							_tau.pi = std::make_shared<Global_State>(tau); /// record _tau's predecessor tau
+							/// record _tau's predecessor tau: for witness
+							//_tau.pi = std::make_shared<Global_State>(tau);
 							W.push(_tau);
 						}
 					}
 				}
 			} else { /// if src == final
-				cout << "witness path: " << tau << endl; // TODO: print the witness path
+				cout << "witness path: " << tau << endl;
 				// this->reproduce_witness_path(tau.pi);
 				return true;
 			}
