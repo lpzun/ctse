@@ -167,7 +167,13 @@ void tse::parse_sat_solution(const model& m) {
 			if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
 				break;
 	}
-	max_z = get_z3_const_uint(m.eval(sum_z));
+	cout << sum_z << endl;
+	const auto z = get_z3_const_uint(m.eval(sum_z));
+	if (max_z < z)
+		max_z = z;
+//	else
+//		max_z++;
+	cout << max_n << "=======================" << max_z << endl;
 }
 
 /**
@@ -196,7 +202,7 @@ bool tse::solicit_for_CEGAR() {
 		/// add incremental constraint
 		s_solver.add(n_0 > ctx.int_val(max_n));
 		if (max_z > 0 && !sum_z.is_int())
-			s_solver.add(sum_z > ctx.int_val(sum_z));
+			s_solver.add(sum_z > ctx.int_val(max_z));
 
 		/// apply  incremental solving
 		switch (this->check_sat_via_smt_solver()) {

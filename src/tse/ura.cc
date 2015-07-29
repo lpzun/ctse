@@ -147,8 +147,7 @@ bool ura::reachability_analysis_via_tse(const string& filename) {
 			for (auto iv = s_in_out[is].first.begin();
 					iv != s_in_out[is].first.end(); ++iv)
 				cout << "x" << *iv
-						<< (std::next(iv) != s_in_out[is].first.end() ?
-								" + " : "");
+						<< " + ";
 			for (auto iv = s_in_out[is].second.begin();
 					iv != s_in_out[is].second.end(); ++iv)
 				cout << " - " << "x" << *iv;
