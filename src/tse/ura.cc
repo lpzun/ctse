@@ -153,6 +153,7 @@ bool ura::reachability_analysis_via_tse(const string& filename) {
 				cout << " - " << "x" << *iv;
 			cout << "\n";
 		}
+		DBG_LOC();
 #endif
 
 		if (Refs::OPT_PRINT_ADJ || Refs::OPT_PRINT_ALL) {

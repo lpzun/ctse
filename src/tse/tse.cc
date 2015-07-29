@@ -72,7 +72,6 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out,
 	const auto& c_S = this->build_CS(s_in_out);
 	for (size_t i = 0; i != c_S.size(); ++i)
 		s_solver.add(c_S[i] == 0);
-
 #ifndef NDEBUG
 	for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
 		cout << *iphi << "\n";
@@ -102,7 +101,7 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
 			phi[i] = phi[i]
 					- ctx.int_const((x_affix + std::to_string(*out)).c_str());
 	}
-
+	DBG_LOC();
 	return phi;
 }
 
@@ -130,6 +129,7 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
 			phi[i] = phi[i]
 					- ctx.int_const((x_affix + std::to_string(*out)).c_str());
 	}
+	DBG_LOC();
 	return phi;
 }
 
@@ -138,6 +138,7 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
  * @return void
  */
 result tse::check_sat_via_smt_solver() {
+	DBG_LOC();
 	switch (s_solver.check()) {
 	case sat:
 		this->parse_sat_solution(s_solver.get_model());
@@ -167,13 +168,11 @@ void tse::parse_sat_solution(const model& m) {
 			if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
 				break;
 	}
-	cout << sum_z << endl;
 	const auto z = get_z3_const_uint(m.eval(sum_z));
 	if (max_z < z)
 		max_z = z;
 //	else
 //		max_z++;
-	cout << max_n << "=======================" << max_z << endl;
 }
 
 /**
