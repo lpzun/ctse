@@ -143,9 +143,6 @@ inline bool operator<(const Switch& arg1, const Switch& arg2) {
 
 class cmd_line {
 public:
-
-//	static Cmd_Line& instance();
-
 	cmd_line();
 	virtual ~cmd_line();
 
@@ -210,14 +207,13 @@ private:
 	map<short, deque<Switch>> switches;
 	vector<string> types;
 
-//	static unique_ptr<Cmd_Line> m_instance;
-
 	void create_argument_list();
 	string create_version_info();
 
 	void add_option(const short& type, const string& short_name,
 			const string& long_name, const string& meaning,
 			const string& default_value);
+
 	void add_switch(const short& type, const string& short_name,
 			const string& long_name, const string& meaning);
 

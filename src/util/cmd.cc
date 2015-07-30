@@ -7,12 +7,6 @@
 
 #include "cmd.hh"
 
-//static Cmd_Line& Cmd_Line::instance() {
-//	static Cmd_Line instance;
-//	m_instance = &instance;
-//	return *m_instance;
-//}
-
 cmd_line::cmd_line() :
 		SHORT_HELP_OPT("-h"), LONG_HELP_OPT("--help"), SHORT_VERSION_OPT("-v"), LONG_VERSION_OPT(
 				"--version"), VERSION("v1.0"), name_width(0), help_message(
@@ -104,9 +98,9 @@ void cmd_line::add_option(const short& type, const string& short_name,
 		const string& default_value) {
 	this->options[type].push_back(
 			Options(type, short_name, long_name, meaning, default_value));
-	this->name_width =
-			name_width < short_name.size() + long_name.size() + 5 ?
-					short_name.size() + long_name.size() + 5 : name_width;
+
+	if (name_width < short_name.size() + long_name.size() + 10)
+		this->name_width = short_name.size() + long_name.size() + 10;
 }
 
 /**
@@ -120,9 +114,8 @@ void cmd_line::add_switch(const short& type, const string& short_name,
 		const string& long_name, const string& meaning) {
 	this->switches[type].push_back(
 			Switch(type, short_name, long_name, meaning));
-	this->name_width =
-			name_width < short_name.size() + long_name.size() + 5 ?
-					short_name.size() + long_name.size() + 5 : name_width;
+	if (name_width < short_name.size() + long_name.size() + 10)
+		this->name_width = short_name.size() + long_name.size() + 10;
 }
 
 /**
@@ -174,8 +167,7 @@ void cmd_line::print_usage_info(const string& prog_name, cushort& indent,
 	out << " "
 			<< PPRINT::widthify(prog_name + " -f source.tts ", this->name_width,
 					PPRINT::LEFTJUST)
-			<< PPRINT::widthify("-a source.prop", PPRINT::LEFTJUST)
-			<< "\n";
+			<< PPRINT::widthify("-a source.prop", PPRINT::LEFTJUST) << "\n";
 
 	for (size_t i = 0; i < types.size(); i++) {
 		out << types[i] << "\n";
@@ -243,34 +235,20 @@ void cmd_line::create_argument_list() {
 			"output generated expanded TTD to a .dot file");
 
 	/// exploration mode
-//	cmd.add_option(EXP_MODE_OPTS, "-m", "--mode", (string("exploration mode:\n") //
-//	///+ string(25, ' ') + " -" + '"' + OPT_FWS + '"' + ": forward search: oracle\n" //
-//			+ string(25, ' ') + " -" + '"' + OPT_MODE_LDP + '"' + ": logic decision problem\n" //
-//	///		+ string(25, ' ') + " -" + '"' + OPT_CON + '"' + ": concurrent forward/logic decision\n" //
-//			).c_str(), "S");
-
-//	cmd.add_switch(EXP_MODE_OPTS, "-t", "--bwstree", "show backward search tree");
-//	cmd.add_switch(EXP_MODE_OPTS, "-p", "--path", "show all paths in SCC quotient graph");
-	//cmd.add_switch(EXP_MODE_OPTS, "-cmp", "--complete", "verification via a complete approach");
-	//cmd.add_switch(EXP_MODE_OPTS, "-bws", "--backward", "backward search based encoding (default=false)");
-	//cmd.add_switch(EXP_MODE_OPTS, "-sh", "--shared", "shared states based constraints (default=false)");
-
-	this->add_switch(exp_mode_opts(), "-n", "--initial-threads",
-			"the number of threads at initial state");
-	this->add_switch(exp_mode_opts(), "-z", "--spawn-threads",
-			"the maximal number of spawn threads");
+	this->add_option(exp_mode_opts(), "-n", "--init-threads",
+			"the number of threads at initial state", "1");
+	this->add_option(exp_mode_opts(), "-z", "--spawn-threads",
+			"the maximal number of spawn threads", "0");
+	this->add_switch(exp_mode_opts(), "-vs", "--vertical-trans",
+			"keep the vertical transitions and self-loops");
 
 	this->add_switch(exp_mode_opts(), "-ce", "--counterexample",
 			"show counterexample");
-	//cmd.add_switch(OTHER_OPTS, "-ns", "--nosimpl", "simplify the generated Presburger formula");
 	this->add_switch(exp_mode_opts(), "-cs", "--cstr",
 			"output intermediate constraints");
-
 	/// SMT Solver options
-	//DBG_STD(cmd.add_option(SMT_SOLVER_OPTS, "-smt", "--smt-solver", "set the SMT Solver to be used", "z3"));
 
 	/// other options
-
 	this->add_switch(other_opts(), "-cmd", "--cmd-line",
 			"show the command line");
 	this->add_switch(other_opts(), "-all", "--all",
