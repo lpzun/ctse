@@ -97,8 +97,7 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 			DBG_STD(
 					cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << " "
 					<< transition_ID << "\n")
-			/// remove self loops and vertical transitions
-			if (!is_vertical && l1 == l2)
+			if (!is_vertical && s1 == s2 && l1 == l2) /// remove self loops
 				continue;
 
 			if (sep == "->" || sep == "+>") {

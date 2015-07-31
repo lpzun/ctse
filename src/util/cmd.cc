@@ -239,8 +239,8 @@ void cmd_line::create_argument_list() {
 			"the number of threads at initial state", "1");
 	this->add_option(exp_mode_opts(), "-z", "--spawn-threads",
 			"the maximal number of spawn threads", "0");
-	this->add_switch(exp_mode_opts(), "-vs", "--vertical-trans",
-			"keep the vertical transitions and self-loops");
+	this->add_switch(exp_mode_opts(), "-vs", "--self-loop",
+			"keep the self-loops");
 
 	this->add_switch(exp_mode_opts(), "-ce", "--counterexample",
 			"show counterexample");
