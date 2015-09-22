@@ -58,8 +58,8 @@ int main(const int argc, const char * const * const argv) {
 				"--cstr");
 		Refs::OPT_PRINT_ALL = cmd.arg_bool(cmd_line::other_opts(), "--all");
 
-		const bool& is_vertical = cmd.arg_bool(cmd_line::exp_mode_opts(),
-				"--vertical-trans");
+		const bool& is_self_loop = cmd.arg_bool(cmd_line::exp_mode_opts(),
+				"--self-loop");
 
 		if (cmd.arg_bool(cmd_line::other_opts(), "--cmd-line")
 				|| Refs::OPT_PRINT_ALL) {
@@ -74,7 +74,7 @@ int main(const int argc, const char * const * const argv) {
 
 		ura u;
 		const bool& is_reachable = u.unbounded_reachability_analysis(filename,
-				initl_ts, final_ts, is_vertical);
+				initl_ts, final_ts, is_self_loop);
 		cout << "======================================================\n";
 		cout << " " << Refs::FINAL_TS;
 		if (is_reachable)

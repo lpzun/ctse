@@ -26,10 +26,10 @@ ura::~ura() {
  * @return
  */
 bool ura::unbounded_reachability_analysis(const string& filename,
-		const string& s_initl, const string& s_final, const bool& is_vertical) {
+		const string& s_initl, const string& s_final, const bool& is_self_loop) {
 	Refs::INITL_TS = this->parse_input_tss(s_initl);
 	Refs::FINAL_TS = this->parse_input_tss(s_final);
-	return this->reachability_analysis_via_tse(filename, is_vertical);
+	return this->reachability_analysis_via_tse(filename, is_self_loop);
 }
 
 /**
@@ -59,7 +59,7 @@ Thread_State ura::parse_input_tss(const string& str_ts) {
  * @param filename: the name of input .ttd file
  */
 bool ura::reachability_analysis_via_tse(const string& filename,
-		const bool& is_vertical) {
+		const bool& is_self_loop) {
 	if (filename == "X") { // make random structure
 		throw ural_rt_err("Please assign the input file!");
 	} else {
@@ -97,7 +97,7 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 			DBG_STD(
 					cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << " "
 					<< transition_ID << "\n")
-			if (!is_vertical && s1 == s2 && l1 == l2) /// remove self loops
+			if (!is_self_loop && s1 == s2 && l1 == l2) /// remove self loops
 				continue;
 
 			if (sep == "->" || sep == "+>") {

@@ -141,6 +141,7 @@ result tse::check_sat_via_smt_solver() {
 	DBG_LOC();
 	switch (s_solver.check()) {
 	case sat:
+		cout<<"----------I am here\n";
 		this->parse_sat_solution(s_solver.get_model());
 		if (check_reach_with_fixed_threads(max_n, max_z))
 			return result::reach;
@@ -171,6 +172,7 @@ void tse::parse_sat_solution(const model& m) {
 	const auto z = get_z3_const_uint(m.eval(sum_z));
 	if (max_z < z)
 		max_z = z;
+	cout<<"----------I am here--------"<<z;
 //	else
 //		max_z++;
 }
@@ -228,7 +230,6 @@ bool tse::solicit_for_CEGAR() {
  */
 bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 	auto spw = z;
-//	cout << "===============================" << spw << endl;
 	queue<Global_State, list<Global_State>> W; /// worklist
 	W.push(Global_State(Refs::INITL_TS, n)); /// start from the initial state with n threads
 	set<Global_State> R; /// reachable global states
