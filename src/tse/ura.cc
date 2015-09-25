@@ -98,7 +98,7 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 					cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << " "
 					<< transition_ID << "\n")
 			if (!is_self_loop && s1 == s2 && l1 == l2){ /// remove self loops
-				cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << endl;
+				cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << endl; // TODO-----------------delete--------------
 				continue;
 			}
 
@@ -127,7 +127,7 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 		}
 		new_in.close();
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
 		cout << __func__ << "\n";
 		cout << "Initial Thread State " << Refs::INITL_TS << "\t";
 		cout << "Final Thread State " << Refs::FINAL_TS << "\n";
@@ -157,7 +157,7 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 			cout << "\n";
 		}
 		DBG_LOC();
-#endif
+//#endif
 
 		if (Refs::OPT_PRINT_ADJ || Refs::OPT_PRINT_ALL) {
 			cout << "The original TTD:" << endl;
