@@ -10,10 +10,8 @@
 namespace sura {
 
 tse::tse(const id_tran &size_R, const deque<id_tran>& spawns) :
-		ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(
-				ctx.int_val(0)), max_n(0), max_z(0), s_solver(
-				(tactic(ctx, "simplify") & tactic(ctx, "qe")
-						& tactic(ctx, "smt")).mk_solver()) {
+		ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
+				(tactic(ctx, "simplify") & tactic(ctx, "smt")).mk_solver()) {
 	/// set up the expression of summarizing all spawn variables
 	for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
 		const id_tran& id = *iv;
@@ -32,8 +30,7 @@ tse::~tse() {
  * 		true : if reachable
  * 		false: otherwise
  */
-bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out,
-		const vector<inout>& s_in_out) {
+bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out, const vector<inout>& s_in_out) {
 	switch (this->solicit_for_TSE(l_in_out, s_in_out)) {
 	case result::reach:
 		return true;
@@ -50,15 +47,13 @@ bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out,
  * @param s_in_out
  * @return
  */
-result tse::solicit_for_TSE(const vector<inout>& l_in_out,
-		const vector<inout>& s_in_out) {
+result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& s_in_out) {
 	/// add n_0 >= 1
 	s_solver.add(n_0 >= 1);
 
 	/// add x_i >= 0
 	for (uint idx = 0; idx < x_index; ++idx)
-		s_solver.add(
-				ctx.int_const((x_affix + std::to_string(idx)).c_str()) >= 0);
+		s_solver.add(ctx.int_const((x_affix + std::to_string(idx)).c_str()) >= 0);
 
 	/// add C_L constraints
 	const auto& c_L = this->build_CL(l_in_out);
@@ -74,9 +69,9 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out,
 		s_solver.add(c_S[i] == 0);
 #ifndef NDEBUG
 	for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
-		cout << *iphi << "\n";
+	cout << *iphi << "\n";
 	for (auto iphi = c_S.begin(); iphi != c_S.end(); ++iphi)
-		cout << *iphi << "\n";
+	cout << *iphi << "\n";
 #endif
 	return this->check_sat_via_smt_solver();
 }
@@ -91,15 +86,11 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
 	phi[Refs::INITL_TS.get_local()] = n_0;
 
 	for (size_t i = 0; i < l_in_out.size(); ++i) {
-		for (auto inc = l_in_out[i].first.begin();
-				inc != l_in_out[i].first.end(); ++inc)
-			phi[i] = phi[i]
-					+ ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+		for (auto inc = l_in_out[i].first.begin(); inc != l_in_out[i].first.end(); ++inc)
+			phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
-		for (auto out = l_in_out[i].second.begin();
-				out != l_in_out[i].second.end(); ++out)
-			phi[i] = phi[i]
-					- ctx.int_const((x_affix + std::to_string(*out)).c_str());
+		for (auto out = l_in_out[i].second.begin(); out != l_in_out[i].second.end(); ++out)
+			phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
 	}
 	DBG_LOC();
 	return phi;
@@ -119,15 +110,11 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
 	}
 
 	for (size_t i = 0; i < s_in_out.size(); ++i) {
-		for (auto inc = s_in_out[i].first.begin();
-				inc != s_in_out[i].first.end(); ++inc)
-			phi[i] = phi[i]
-					+ ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+		for (auto inc = s_in_out[i].first.begin(); inc != s_in_out[i].first.end(); ++inc)
+			phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
-		for (auto out = s_in_out[i].second.begin();
-				out != s_in_out[i].second.end(); ++out)
-			phi[i] = phi[i]
-					- ctx.int_const((x_affix + std::to_string(*out)).c_str());
+		for (auto out = s_in_out[i].second.begin(); out != s_in_out[i].second.end(); ++out)
+			phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
 	}
 	DBG_LOC();
 	return phi;
@@ -141,7 +128,7 @@ result tse::check_sat_via_smt_solver() {
 	DBG_LOC();
 	switch (s_solver.check()) {
 	case sat:
-		cout<<"----------I am here\n";
+		cout << "----------I am here\n"; //TODO: ----------------------delete--
 		this->parse_sat_solution(s_solver.get_model());
 		if (check_reach_with_fixed_threads(max_n, max_z))
 			return result::reach;
@@ -162,6 +149,7 @@ void tse::parse_sat_solution(const model& m) {
 	cout << __func__ << "\n";
 	cout << m << endl;
 #endif
+	cout << m << endl; //TODO: ----------------------delete--
 	for (size_t i = 0; i < m.size(); i++) {
 		func_decl v = m[i];
 		assert(v.arity() == 0); /// check if contains only constants
@@ -172,7 +160,6 @@ void tse::parse_sat_solution(const model& m) {
 	const auto z = get_z3_const_uint(m.eval(sum_z));
 	if (max_z < z)
 		max_z = z;
-	cout<<"----------I am here--------"<<z;
 //	else
 //		max_z++;
 }
@@ -237,26 +224,22 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 		Global_State tau = W.front();
 		W.pop();
 		const ushort &shared = tau.get_share();
-		for (auto il = tau.get_locals().begin(); il != tau.get_locals().end();
-				++il) {
+		for (auto il = tau.get_locals().begin(); il != tau.get_locals().end(); ++il) {
 			Thread_State src(shared, il->first);
 			if (src != Refs::FINAL_TS) {
 				auto ifind = Refs::original_TTD.find(src);
 				if (ifind != Refs::original_TTD.end()) {
-					for (auto idst = ifind->second.begin();
-							idst != ifind->second.end(); ++idst) {
+					for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
 						auto locals = tau.get_locals();
 						if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
 							if (spw > 0) {
 								spw--;
-								locals = this->update_counter(locals,
-										idst->get_local());
+								locals = this->update_counter(locals, idst->get_local());
 							} else { /// if the we already spawn z times, we can't
 								continue; /// spawn any more and have to skip src +> dst;
 							}
 						} else {
-							locals = this->update_counter(locals,
-									src.get_local(), idst->get_local());
+							locals = this->update_counter(locals, src.get_local(), idst->get_local());
 						}
 						Global_State _tau(idst->get_share(), locals);
 						if (R.insert(_tau).second) {
@@ -282,8 +265,7 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
  * @param inc: local state whose counter is incremented
  * @return local states after updating counters
  */
-map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
-		const ushort &inc) {
+map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &inc) {
 	auto _Z = Z;   /// local copy of Z
 
 	auto iinc = _Z.find(inc);
@@ -303,8 +285,7 @@ map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
  * @param inc: local state whose counter is incremented
  * @return local states after updating counters
  */
-map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
-		const ushort &dec, const ushort &inc) {
+map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &dec, const ushort &inc) {
 	if (dec == inc) /// if dec == inc
 		return Z;
 
@@ -338,8 +319,7 @@ map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
  * 			true : src +> dst
  * 			false: otherwise
  */
-bool tse::is_spawn_transition(const Thread_State& src,
-		const Thread_State& dst) {
+bool tse::is_spawn_transition(const Thread_State& src, const Thread_State& dst) {
 	auto ifind = Refs::spawntra_TTD.find(src);
 	if (ifind == Refs::spawntra_TTD.end()) {
 		return false;
