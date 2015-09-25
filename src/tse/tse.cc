@@ -10,13 +10,8 @@
 namespace sura {
 
 tse::tse(const id_tran &size_R, const deque<id_tran>& spawns) :
-<<<<<<< HEAD
 		ctx(), n_0(ctx.int_const("n0")), x_affix("r_"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
 				(tactic(ctx, "simplify") & tactic(ctx, "solve-eqs")).mk_solver()) {
-=======
-		ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
-				(tactic(ctx, "simplify") & tactic(ctx, "smt")).mk_solver()) {
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
 	/// set up the expression of summarizing all spawn variables
 	for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
 		const id_tran& id = *iv;
@@ -159,19 +154,19 @@ return result::unreach;
 =======
 switch (s_solver.check()) {
 	case sat:
-<<<<<<< HEAD
+	<<<<<<< HEAD
 	cout << "----------I am here\n"; //TODO: ----------------------delete--
 	this->parse_sat_solution(s_solver.get_model());
 	if (check_reach_with_fixed_threads(max_n, max_z))
 	return result::reach;
 	return result::unknown;
-=======
-		cout << "----------I am here\n"; //TODO: ----------------------delete--
-		this->parse_sat_solution(s_solver.get_model());
-		if (check_reach_with_fixed_threads(max_n, max_z))
-			return result::reach;
-		return result::unknown;
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
+	=======
+	cout << "----------I am here\n";//TODO: ----------------------delete--
+	this->parse_sat_solution(s_solver.get_model());
+	if (check_reach_with_fixed_threads(max_n, max_z))
+	return result::reach;
+	return result::unknown;
+	>>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
 	case unsat:
 	return result::unreach;
 	case unknown:
@@ -206,18 +201,18 @@ cout << "----------I am here--------" << z;
 =======
 >>>>>>> branch 'master' of https: //github.com/lpzun/ctse.git
 =======
-	cout << m << endl; //TODO: ----------------------delete--
-	for (size_t i = 0; i < m.size(); i++) {
-		func_decl v = m[i];
-		assert(v.arity() == 0); /// check if contains only constants
-		if (v.name() == n_0.decl().name())
-			if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
-				break;
-	}
-	const auto z = get_z3_const_uint(m.eval(sum_z));
-	if (max_z < z)
-		max_z = z;
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
+cout << m << endl;//TODO: ----------------------delete--
+for (size_t i = 0; i < m.size(); i++) {
+	func_decl v = m[i];
+	assert(v.arity() == 0); /// check if contains only constants
+	if (v.name() == n_0.decl().name())
+		if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
+			break;
+}
+const auto z = get_z3_const_uint(m.eval(sum_z));
+if (max_z < z)
+	max_z = z;
+>>>>>>> branch 'master' of https: //github.com/lpzun/ctse.git
 //	else
 //		max_z++;
 }
@@ -285,165 +280,165 @@ W.pop();
 const ushort &shared = tau.get_share();
 for (auto il = tau.get_locals().begin(); il != tau.get_locals().end(); ++il) {
 	Thread_State src(shared, il->first);
-	if (src != Refs::FINAL_TS) {
-		auto ifind = Refs::original_TTD.find(src);
-		if (ifind != Refs::original_TTD.end()) {
-			for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
-				auto locals = tau.get_locals();
-				if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
-					if (spw > 0) {
-						spw--;
-						locals = this->update_counter(locals, idst->get_local());
-					} else { /// if the we already spawn z times, we can't
-						continue; /// spawn any more and have to skip src +> dst;
-=======
-	auto spw = z;
-	queue<Global_State, list<Global_State>> W; /// worklist
-	W.push(Global_State(Refs::INITL_TS, n)); /// start from the initial state with n threads
-	set<Global_State> R; /// reachable global states
-	while (!W.empty()) {
-		Global_State tau = W.front();
-		W.pop();
-		const ushort &shared = tau.get_share();
-		for (auto il = tau.get_locals().begin(); il != tau.get_locals().end(); ++il) {
-			Thread_State src(shared, il->first);
-			if (src != Refs::FINAL_TS) {
-				auto ifind = Refs::original_TTD.find(src);
-				if (ifind != Refs::original_TTD.end()) {
-					for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
-						auto locals = tau.get_locals();
-						if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
-							if (spw > 0) {
-								spw--;
-								locals = this->update_counter(locals, idst->get_local());
-							} else { /// if the we already spawn z times, we can't
-								continue; /// spawn any more and have to skip src +> dst;
+if (src != Refs::FINAL_TS) {
+	auto ifind = Refs::original_TTD.find(src);
+	if (ifind != Refs::original_TTD.end()) {
+		for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
+			auto locals = tau.get_locals();
+			if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
+				if (spw > 0) {
+					spw--;
+					locals = this->update_counter(locals, idst->get_local());
+				} else { /// if the we already spawn z times, we can't
+					continue;/// spawn any more and have to skip src +> dst;
+					=======
+					auto spw = z;
+					queue<Global_State, list<Global_State>> W;/// worklist
+					W.push(Global_State(Refs::INITL_TS, n));/// start from the initial state with n threads
+					set<Global_State> R;/// reachable global states
+					while (!W.empty()) {
+						Global_State tau = W.front();
+						W.pop();
+						const ushort &shared = tau.get_share();
+						for (auto il = tau.get_locals().begin(); il != tau.get_locals().end(); ++il) {
+							Thread_State src(shared, il->first);
+							if (src != Refs::FINAL_TS) {
+								auto ifind = Refs::original_TTD.find(src);
+								if (ifind != Refs::original_TTD.end()) {
+									for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
+										auto locals = tau.get_locals();
+										if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
+											if (spw > 0) {
+												spw--;
+												locals = this->update_counter(locals, idst->get_local());
+											} else { /// if the we already spawn z times, we can't
+												continue;/// spawn any more and have to skip src +> dst;
+											}
+										} else {
+											locals = this->update_counter(locals, src.get_local(), idst->get_local());
+										}
+										Global_State _tau(idst->get_share(), locals);
+										if (R.insert(_tau).second) {
+											/// record _tau's predecessor tau: for witness
+											//_tau.pi = std::make_shared<Global_State>(tau);
+											W.push(_tau);
+										}
+										>>>>>>> branch 'master' of https:					//github.com/lpzun/ctse.git
+									}
+								} else {
+									locals = this->update_counter(locals, src.get_local(), idst->get_local());
+								}
+								Global_State _tau(idst->get_share(), locals);
+								if (R.insert(_tau).second) {
+									/// record _tau's predecessor tau: for witness
+									//_tau.pi = std::make_shared<Global_State>(tau);
+									W.push(_tau);
+								}
 							}
-						} else {
-							locals = this->update_counter(locals, src.get_local(), idst->get_local());
 						}
-						Global_State _tau(idst->get_share(), locals);
-						if (R.insert(_tau).second) {
-							/// record _tau's predecessor tau: for witness
-							//_tau.pi = std::make_shared<Global_State>(tau);
-							W.push(_tau);
-						}
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
+					} else { /// if src == final
+						cout << "witness path: " << tau << endl;
+						// this->reproduce_witness_path(tau.pi);
+						return true;
 					}
-				} else {
-					locals = this->update_counter(locals, src.get_local(), idst->get_local());
-				}
-				Global_State _tau(idst->get_share(), locals);
-				if (R.insert(_tau).second) {
-					/// record _tau's predecessor tau: for witness
-					//_tau.pi = std::make_shared<Global_State>(tau);
-					W.push(_tau);
 				}
 			}
-		}
-	} else { /// if src == final
-		cout << "witness path: " << tau << endl;
-		// this->reproduce_witness_path(tau.pi);
-		return true;
-	}
-}
-}
-return false;
-}
-
-/**
- * @brief This procedure updates the counters of local states.
- * @param Z  : the part of local states
- * @param inc: local state whose counter is incremented
- * @return local states after updating counters
- */
-map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &inc) {
-<<<<<<< HEAD
-auto _Z = Z;   /// local copy of Z
-=======
-	auto _Z = Z;   /// local copy of Z
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
-
-auto iinc = _Z.find(inc);
-if (iinc != _Z.end()) {
-iinc->second++;
-} else {
-_Z[inc] = 1;
-}
-
-return _Z;
-}
-
-/**
- * @brief This procedure updates the counters of local states.
- * @param Z  : the part of local states
- * @param dec: local state whose counter is decremented
- * @param inc: local state whose counter is incremented
- * @return local states after updating counters
- */
-map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &dec, const ushort &inc) {
-<<<<<<< HEAD
-if (dec == inc) /// if dec == inc
-return Z;
-=======
-	if (dec == inc) /// if dec == inc
-		return Z;
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
-
-auto _Z = Z;   /// local copy of Z
-
-auto idec = _Z.find(dec);
-if (idec != _Z.end()) {
-idec->second--;
-if (idec->second == 0)
-	_Z.erase(idec);
-} else {
-throw ural_rt_err("FWS::update_counter: local state misses");
-}
-
-auto iinc = _Z.find(inc);
-if (iinc != _Z.end()) {
-iinc->second++;
-} else {
-_Z[inc] = 1;
-}
-
-return _Z;
-}
-
-/**
- * @brief determine if (src, dst) correspßonds to a spawn transition
- * @param src
- * @param dst
- * @param spawn_trans
- * @return bool
- * 			true : src +> dst
- * 			false: otherwise
- */
-bool tse::is_spawn_transition(const Thread_State& src, const Thread_State& dst) {
-<<<<<<< HEAD
-auto ifind = Refs::spawntra_TTD.find(src);
-if (ifind == Refs::spawntra_TTD.end()) {
-return false;
-} else {
-auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);
-if (ifnd == ifind->second.end())
-	return false;
-else
-	return true;
-}
-=======
-	auto ifind = Refs::spawntra_TTD.find(src);
-	if (ifind == Refs::spawntra_TTD.end()) {
-		return false;
-	} else {
-		auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);
-		if (ifnd == ifind->second.end())
 			return false;
-		else
-			return true;
-	}
->>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
-}
+		}
 
-} /* namespace sura */
+		/**
+		 * @brief This procedure updates the counters of local states.
+		 * @param Z  : the part of local states
+		 * @param inc: local state whose counter is incremented
+		 * @return local states after updating counters
+		 */
+		map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &inc) {
+			<<<<<<< HEAD
+			auto _Z = Z;   /// local copy of Z
+			=======
+			auto _Z = Z;/// local copy of Z
+			>>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
+
+			auto iinc = _Z.find(inc);
+			if (iinc != _Z.end()) {
+				iinc->second++;
+			} else {
+				_Z[inc] = 1;
+			}
+
+			return _Z;
+		}
+
+		/**
+		 * @brief This procedure updates the counters of local states.
+		 * @param Z  : the part of local states
+		 * @param dec: local state whose counter is decremented
+		 * @param inc: local state whose counter is incremented
+		 * @return local states after updating counters
+		 */
+		map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &dec, const ushort &inc) {
+			<<<<<<< HEAD
+			if (dec == inc) /// if dec == inc
+			return Z;
+			=======
+			if (dec == inc)/// if dec == inc
+			return Z;
+			>>>>>>> branch 'master' of https://github.com/lpzun/ctse.git
+
+			auto _Z = Z;/// local copy of Z
+
+			auto idec = _Z.find(dec);
+			if (idec != _Z.end()) {
+				idec->second--;
+				if (idec->second == 0)
+				_Z.erase(idec);
+			} else {
+				throw ural_rt_err("FWS::update_counter: local state misses");
+			}
+
+			auto iinc = _Z.find(inc);
+			if (iinc != _Z.end()) {
+				iinc->second++;
+			} else {
+				_Z[inc] = 1;
+			}
+
+			return _Z;
+		}
+
+		/**
+		 * @brief determine if (src, dst) correspßonds to a spawn transition
+		 * @param src
+		 * @param dst
+		 * @param spawn_trans
+		 * @return bool
+		 * 			true : src +> dst
+		 * 			false: otherwise
+		 */
+		bool tse::is_spawn_transition(const Thread_State& src, const Thread_State& dst) {
+			<<<<<<< HEAD
+			auto ifind = Refs::spawntra_TTD.find(src);
+			if (ifind == Refs::spawntra_TTD.end()) {
+				return false;
+			} else {
+				auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);
+				if (ifnd == ifind->second.end())
+				return false;
+				else
+				return true;
+			}
+			=======
+			auto ifind = Refs::spawntra_TTD.find(src);
+			if (ifind == Refs::spawntra_TTD.end()) {
+				return false;
+			} else {
+				auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);
+				if (ifnd == ifind->second.end())
+				return false;
+				else
+				return true;
+			}
+			>>>>>>> branch 'master' of https:   //github.com/lpzun/ctse.git
+		}
+
+	} /* namespace sura */
