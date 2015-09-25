@@ -97,8 +97,10 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 			DBG_STD(
 					cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << " "
 					<< transition_ID << "\n")
-			if (!is_self_loop && s1 == s2 && l1 == l2) /// remove self loops
+			if (!is_self_loop && s1 == s2 && l1 == l2){ /// remove self loops
+				cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << endl;
 				continue;
+			}
 
 			if (sep == "->" || sep == "+>") {
 				const Thread_State src_TS(s1, l1);
