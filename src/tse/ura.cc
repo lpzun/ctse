@@ -127,23 +127,23 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 		}
 		new_in.close();
 
-//#ifndef NDEBUG
+#ifndef NDEBUG
 		cout << __func__ << "\n";
 		cout << "Initial Thread State " << Refs::INITL_TS << "\t";
 		cout << "Final Thread State " << Refs::FINAL_TS << "\n";
 
-		for (size_t is = 0; is < l_in_out.size(); ++is) {
-			cout << "local state: " << is << " ";
-			for (auto iv = l_in_out[is].first.begin();
-					iv != l_in_out[is].first.end(); ++iv)
-			cout << "x" << *iv
-			<< (std::next(iv) != l_in_out[is].first.end() ?
-					" + " : "");
-			for (auto iv = l_in_out[is].second.begin();
-					iv != l_in_out[is].second.end(); ++iv)
-			cout << " - " << "x" << *iv;
-			cout << "\n";
-		}
+//		for (size_t is = 0; is < l_in_out.size(); ++is) {
+//			cout << "local state: " << is << " ";
+//			for (auto iv = l_in_out[is].first.begin();
+//					iv != l_in_out[is].first.end(); ++iv)
+//			cout << "x" << *iv
+//			<< (std::next(iv) != l_in_out[is].first.end() ?
+//					" + " : "");
+//			for (auto iv = l_in_out[is].second.begin();
+//					iv != l_in_out[is].second.end(); ++iv)
+//			cout << " - " << "x" << *iv;
+//			cout << "\n";
+//		}
 
 		for (size_t is = 0; is < s_in_out.size(); ++is) {
 			cout << "shared state: " << is << " ";
@@ -157,7 +157,7 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 			cout << "\n";
 		}
 		DBG_LOC();
-//#endif
+#endif
 
 		if (Refs::OPT_PRINT_ADJ || Refs::OPT_PRINT_ALL) {
 			cout << "The original TTD:" << endl;

@@ -11,7 +11,7 @@ namespace sura {
 
 tse::tse(const id_tran &size_R, const deque<id_tran>& spawns) :
 		ctx(), n_0(ctx.int_const("n0")), x_affix("r_"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
-				(tactic(ctx, "simplify") & tactic(ctx, "solve-eqs")).mk_solver()) {
+				(tactic(ctx, "simplify") & tactic(ctx, "solve-eqs") & tactic(ctx, "smt")).mk_solver()) {
 	/// set up the expression of summarizing all spawn variables
 	for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
 		const id_tran& id = *iv;
@@ -58,16 +58,15 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& 
 	/// add C_L constraints
 	const auto& c_L = this->build_CL(l_in_out);
 	for (size_t i = 0; i != c_L.size(); ++i)
-		if (i == Refs::FINAL_TS.get_local())
-			s_solver.add(c_L[i] >= 1);
-		else
-			s_solver.add(c_L[i] >= 0);
+//		if (i == Refs::FINAL_TS.get_local())
+//			s_solver.add(c_L[i]);
+//		else
+		s_solver.add(c_L[i]);
 
 	/// add C_S constraints
 	const auto& c_S = this->build_CS(s_in_out);
-	cout<<c_S.size()<<"-----------------------------------000\n";
 	for (size_t i = 0; i != c_S.size(); ++i)
-		s_solver.add(c_S[i] == 0);
+		s_solver.add(c_S[i]);
 
 #ifndef NDEBUG
 	for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
@@ -98,11 +97,20 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
 	phi[Refs::INITL_TS.get_local()] = n_0;
 
 	for (size_t i = 0; i < l_in_out.size(); ++i) {
+		expr lhs(ctx.int_val(0)); // left-hand		side
+		expr rhs(ctx.int_val(0)); // right-hand 	side
+		if (i == Refs::FINAL_TS.get_local())
+			rhs = ctx.int_val(1);
+
 		for (auto inc = l_in_out[i].first.begin(); inc != l_in_out[i].first.end(); ++inc)
-			phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+			//phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
 		for (auto out = l_in_out[i].second.begin(); out != l_in_out[i].second.end(); ++out)
-			phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
+			//phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
+			rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
+
+		phi[i] = (phi[i] + lhs) >= rhs;
 	}
 	DBG_LOC();
 	return phi;
@@ -122,11 +130,18 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
 	}
 
 	for (size_t i = 0; i < s_in_out.size(); ++i) {
+		expr lhs(ctx.int_val(0)); // left-hand 	side
+		expr rhs(ctx.int_val(0)); // right-hand 	side
+
 		for (auto inc = s_in_out[i].first.begin(); inc != s_in_out[i].first.end(); ++inc)
-			phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+			//phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
 		for (auto out = s_in_out[i].second.begin(); out != s_in_out[i].second.end(); ++out)
-			phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
+			//phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
+			rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
+
+		phi[i] = (phi[i] + lhs) == rhs;
 	}
 	DBG_LOC();
 	return phi;
@@ -138,19 +153,17 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
  */
 result tse::check_sat_via_smt_solver() {
 	DBG_LOC();
-	return result::unreach;
-
-//	switch (s_solver.check()) {
-//	case sat:
-//		this->parse_sat_solution(s_solver.get_model());
-//		if (check_reach_with_fixed_threads(max_n, max_z))
-//			return result::reach;
-//		return result::unknown;
-//	case unsat:
-//		return result::unreach;
-//	case unknown:
-//		throw ural_rt_err("smt solver returns unknow!");
-//	}
+	switch (s_solver.check()) {
+	case sat:
+		this->parse_sat_solution(s_solver.get_model());
+		if (check_reach_with_fixed_threads(max_n, max_z))
+			return result::reach;
+		return result::unknown;
+	case unsat:
+		return result::unreach;
+	case unknown:
+		throw ural_rt_err("smt solver returns unknow!");
+	}
 }
 
 /**
