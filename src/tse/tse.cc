@@ -10,7 +10,7 @@
 namespace sura {
 
 tse::tse(const id_tran &size_R, const deque<id_tran>& spawns) :
-		ctx(), n_0(ctx.int_const("n0")), x_affix("r_"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
+		ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
 				(tactic(ctx, "simplify") & tactic(ctx, "solve-eqs") & tactic(ctx, "smt")).mk_solver()) {
 	/// set up the expression of summarizing all spawn variables
 	for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
@@ -58,9 +58,6 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& 
 	/// add C_L constraints
 	const auto& c_L = this->build_CL(l_in_out);
 	for (size_t i = 0; i != c_L.size(); ++i)
-//		if (i == Refs::FINAL_TS.get_local())
-//			s_solver.add(c_L[i]);
-//		else
 		s_solver.add(c_L[i]);
 
 	/// add C_S constraints
@@ -74,8 +71,8 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& 
 	for (auto iphi = c_S.begin(); iphi != c_S.end(); ++iphi)
 	cout << *iphi << "\n";
 #endif
-
-	// TODO ----------------------delete-------------------------------------
+//
+//	// TODO ----------------------delete-------------------------------------
 //	cout << "(declare-fun " << n_0 << " () Int)" << "\n";
 //	for (uint idx = 0; idx < x_index; ++idx)
 //		cout << "(declare-fun " << x_affix << idx << " () Int)" << "\n";
@@ -103,11 +100,9 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
 			rhs = ctx.int_val(1);
 
 		for (auto inc = l_in_out[i].first.begin(); inc != l_in_out[i].first.end(); ++inc)
-			//phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
 		for (auto out = l_in_out[i].second.begin(); out != l_in_out[i].second.end(); ++out)
-			//phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
 			rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
 
 		phi[i] = (phi[i] + lhs) >= rhs;
@@ -134,11 +129,9 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
 		expr rhs(ctx.int_val(0)); // right-hand 	side
 
 		for (auto inc = s_in_out[i].first.begin(); inc != s_in_out[i].first.end(); ++inc)
-			//phi[i] = phi[i] + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
 		for (auto out = s_in_out[i].second.begin(); out != s_in_out[i].second.end(); ++out)
-			//phi[i] = phi[i] - ctx.int_const((x_affix + std::to_string(*out)).c_str());
 			rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
 
 		phi[i] = (phi[i] + lhs) == rhs;
@@ -182,12 +175,17 @@ void tse::parse_sat_solution(const model& m) {
 			if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
 				break;
 	}
-	const auto z = get_z3_const_uint(m.eval(sum_z));
-	if (max_z < z)
-		max_z = z;
-	cout << "----------I am here--------" << z;
-//	else
-//		max_z++;
+
+	if (Refs::is_exists_SPAWN) {
+		const auto z = get_z3_const_uint(m.eval(sum_z));
+//		cout << "----------max_z--------" << max_z << "\n";
+//		cout << "----------sum_z--------" << z << "\n";
+		if (max_z < z)
+			max_z = z;
+		else
+			max_z+=2;
+//		cout << "----------max_z---after-----" << max_z << "\n";
+	}
 }
 
 /**
@@ -242,7 +240,38 @@ bool tse::solicit_for_CEGAR() {
  * 		false: otherwise
  */
 bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
+	/// if there is no spwan transitions, so call standard_FWS
+	if (!Refs::is_exists_SPAWN)
+		return this->standard_FWS(n, z);
+
+	/// enumeratively calling standard_FWS over (1, z) ... (n, ..., z)
+	for (unsigned in = 1; in < n; ++in) {
+		if (this->standard_FWS(in, z))
+			return true;
+	}
+
+	/// enumeratively calling standard_FWS over (n, 1) ... (n, ..., z)
+//	for (unsigned iz = 1; iz < z; ++iz) {
+//		if (this->standard_FWS(n, iz))
+//			return true;
+//	}
+	return false;
+}
+
+/**
+ * @brief  standard bounded forward search
+ * 	    This procedure checks the reachability of final thread state with
+ * 		fixed number of threads, i.e., if there exists a path tau_0 ->* tau_F
+ * 		s.t. tau_F covers final.
+ * @param n: # of initial   threads
+ * @param z: # of spawn transitions
+ * @return bool
+ * 		true : if there is a witness path
+ * 		false: otherwise
+ */
+bool tse::standard_FWS(const uint& n, const uint& z) {
 	auto spw = z;
+//	cout << "fws: " << n << "               " << z << endl;
 	queue<Global_State, list<Global_State>> W; /// worklist
 	W.push(Global_State(Refs::INITL_TS, n)); /// start from the initial state with n threads
 	set<Global_State> R; /// reachable global states
@@ -257,7 +286,7 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 				if (ifind != Refs::original_TTD.end()) {
 					for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
 						auto locals = tau.get_locals();
-						if (this->is_spawn_transition(src, *idst)) { /// if src +> dst true
+						if (Refs::is_exists_SPAWN && this->is_spawn_transition(src, *idst)) { /// if src +> dst true
 							if (spw > 0) {
 								spw--;
 								locals = this->update_counter(locals, idst->get_local());
@@ -276,6 +305,7 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 					}
 				}
 			} else { /// if src == final
+				cout << src << endl;
 				cout << "witness path: " << tau << endl;
 				// this->reproduce_witness_path(tau.pi);
 				return true;

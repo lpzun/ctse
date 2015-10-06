@@ -59,6 +59,7 @@ private:
 
 	bool solicit_for_CEGAR();
 	bool check_reach_with_fixed_threads(const uint& n, const uint& z);
+	bool standard_FWS(const uint& n, const uint& z);
 	map<ushort, ushort> update_counter(const map<ushort, ushort> &Z,
 			const ushort &inc);
 	map<ushort, ushort> update_counter(const map<ushort, ushort> &Z,

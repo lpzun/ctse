@@ -25,8 +25,8 @@ ura::~ura() {
  * @param s_final
  * @return
  */
-bool ura::unbounded_reachability_analysis(const string& filename,
-		const string& s_initl, const string& s_final, const bool& is_self_loop) {
+bool ura::unbounded_reachability_analysis(const string& filename, const string& s_initl, const string& s_final,
+		const bool& is_self_loop) {
 	Refs::INITL_TS = this->parse_input_tss(s_initl);
 	Refs::FINAL_TS = this->parse_input_tss(s_final);
 	return this->reachability_analysis_via_tse(filename, is_self_loop);
@@ -58,8 +58,7 @@ Thread_State ura::parse_input_tss(const string& str_ts) {
  * @brief parse the input TTD
  * @param filename: the name of input .ttd file
  */
-bool ura::reachability_analysis_via_tse(const string& filename,
-		const bool& is_self_loop) {
+bool ura::reachability_analysis_via_tse(const string& filename, const bool& is_self_loop) {
 	if (filename == "X") { // make random structure
 		throw ural_rt_err("Please assign the input file!");
 	} else {
@@ -97,10 +96,8 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 			DBG_STD(
 					cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << " "
 					<< transition_ID << "\n")
-			if (!is_self_loop && s1 == s2 && l1 == l2){ /// remove self loops
-				cout << s1 << " " << l1 << " -> " << s2 << " " << l2 << endl; // TODO-----------------delete--------------
+			if (!is_self_loop && s1 == s2 && l1 == l2) /// remove self loops
 				continue;
-			}
 
 			if (sep == "->" || sep == "+>") {
 				const Thread_State src_TS(s1, l1);
@@ -115,6 +112,8 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 				}
 
 				if (sep == "+>") {
+					if (!Refs::is_exists_SPAWN)
+						Refs::is_exists_SPAWN = true;
 					Refs::spawntra_TTD[src_TS].emplace_back(dst_TS);
 					spawn_vars.emplace_back(transition_ID);
 				}
@@ -132,18 +131,18 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 		cout << "Initial Thread State " << Refs::INITL_TS << "\t";
 		cout << "Final Thread State " << Refs::FINAL_TS << "\n";
 
-//		for (size_t is = 0; is < l_in_out.size(); ++is) {
-//			cout << "local state: " << is << " ";
-//			for (auto iv = l_in_out[is].first.begin();
-//					iv != l_in_out[is].first.end(); ++iv)
-//			cout << "x" << *iv
-//			<< (std::next(iv) != l_in_out[is].first.end() ?
-//					" + " : "");
-//			for (auto iv = l_in_out[is].second.begin();
-//					iv != l_in_out[is].second.end(); ++iv)
-//			cout << " - " << "x" << *iv;
-//			cout << "\n";
-//		}
+		for (size_t is = 0; is < l_in_out.size(); ++is) {
+			cout << "local state: " << is << " ";
+			for (auto iv = l_in_out[is].first.begin();
+					iv != l_in_out[is].first.end(); ++iv)
+			cout << "x" << *iv
+			<< (std::next(iv) != l_in_out[is].first.end() ?
+					" + " : "");
+			for (auto iv = l_in_out[is].second.begin();
+					iv != l_in_out[is].second.end(); ++iv)
+			cout << " - " << "x" << *iv;
+			cout << "\n";
+		}
 
 		for (size_t is = 0; is < s_in_out.size(); ++is) {
 			cout << "shared state: " << is << " ";

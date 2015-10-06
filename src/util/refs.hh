@@ -40,6 +40,8 @@ public:
 	static adj_list original_TTD;
 	static adj_list spawntra_TTD;
 
+	static bool is_exists_SPAWN;
+
 	/// global variable for elapsed time
 	static clock_t ELAPSED_TIME;
 };

@@ -42,6 +42,8 @@ Thread_State Refs::FINAL_TS;
 adj_list Refs::original_TTD;
 adj_list Refs::spawntra_TTD;
 
+bool Refs::is_exists_SPAWN = false;
+
 clock_t Refs::ELAPSED_TIME = clock();
 
 } /* namespace SURA */
