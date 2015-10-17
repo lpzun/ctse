@@ -55,7 +55,7 @@ int main(const int argc, const char * const * const argv) {
 				"--adj-list");
 
 		Refs::OPT_CONSTRAINT = cmd.arg_bool(cmd_line::exp_mode_opts(),
-				"--cstr");
+				"--constraint");
 		Refs::OPT_PRINT_ALL = cmd.arg_bool(cmd_line::other_opts(), "--all");
 
 		const bool& is_self_loop = cmd.arg_bool(cmd_line::exp_mode_opts(),

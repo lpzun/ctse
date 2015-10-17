@@ -218,8 +218,8 @@ void cmd_line::create_argument_list() {
 	this->set_types(types);
 	this->add_switch(default_opts(), SHORT_HELP_OPT, LONG_HELP_OPT,
 			"help information");
-	this->add_switch(default_opts(), "-s", "--statistics",
-			"show statistic information");
+//	this->add_switch(default_opts(), "-stat", "--statistics",
+//			"show statistic information");
 
 	/// problem instance
 	this->add_option(prob_inst_opts(), "-f", "--input-file",
@@ -231,20 +231,20 @@ void cmd_line::create_argument_list() {
 
 	this->add_switch(prob_inst_opts(), "-l", "--adj-list",
 			"show the adjacency list");
-	this->add_switch(prob_inst_opts(), "-dot", "--ettd2dot",
-			"output generated expanded TTD to a .dot file");
+//	this->add_switch(prob_inst_opts(), "-dot", "--ettd2dot",
+//			"output generated expanded TTD to a .dot file");
 
 	/// exploration mode
-	this->add_option(exp_mode_opts(), "-n", "--init-threads",
-			"the number of threads at initial state", "1");
-	this->add_option(exp_mode_opts(), "-z", "--spawn-threads",
-			"the maximal number of spawn threads", "0");
+//	this->add_option(exp_mode_opts(), "-n", "--init-threads",
+//			"the number of threads at initial state", "1");
+//	this->add_option(exp_mode_opts(), "-z", "--spawn-threads",
+//			"the maximal number of spawn threads", "0");
 	this->add_switch(exp_mode_opts(), "-vs", "--self-loop",
 			"keep the self-loops");
 
 	this->add_switch(exp_mode_opts(), "-ce", "--counterexample",
 			"show counterexample");
-	this->add_switch(exp_mode_opts(), "-cs", "--cstr",
+	this->add_switch(exp_mode_opts(), "-cs", "--constraint",
 			"output intermediate constraints");
 	/// SMT Solver options
 
@@ -260,30 +260,24 @@ void cmd_line::create_argument_list() {
 string cmd_line::create_version_info() {
 	string info = ""; ///
 	info ///
+	.append("* *   _/_/_/_/_/         _/_/_/_/         _/_/_/_/     * *\n") ///
+	.append("* *      _/            _/                _/            * *\n") ///
+	.append("* *     _/              _/_/_/          _/_/_/_/       * *\n") ///
+	.append("* *    _/                   _/         _/              * *\n") ///
+	.append("* *   _/            _/_/_/_/          _/_/_/_/    "+ VERSION + " * *\n") ///
 	.append(
-			"* *     _/    _/    _/_/_/       _/_/_/     _/    _/    _/           _/_/_/    * *\n") ///
+			"----------------------------------------------------------\n") ///
 	.append(
-			"* *    _/    _/    _/    _/    _/          _/    _/    _/          _/    _/    * *\n") ///
+			"* *        Unbounded-Thread Program Verification       * *\n") ///
 	.append(
-			"* *   _/    _/    _/_/_/       _/_/_/     _/    _/    _/          _/_/_/_/     * *\n") ///
+			"* *            using Thread-State Equations            * *\n")	///
 	.append(
-			"* *  _/    _/    _/  _/            _/    _/    _/    _/          _/    _/      * *\n") ///
+			"* *            Thomas Wahl's Research Group            * *\n") ///
 	.append(
-			"* * _/_/_/_/    _/     _/    _/_/_/     _/_/_/_/    _/_/_/_/    _/    _/  "
-					+ VERSION + " * *\n") ///
-	.append(
-			"----------------------------------------------------------------------------------\n") ///
-	.append(
-			"* *                      Unbounded-Thread Reachability via                     * *\n") ///
-	.append(
-			"* *                   Symbolic Execution and Loop Acceleration                 * *\n")	///
-	.append(
-			"* *                         Thomas Wahl's Research Group                       * *\n") ///
-	.append(
-			"* *                    Northeastern University, United States                  * *\n") ///
-	.append("* *                                         Build Time: ").append(
+			"* *        Northeastern University, United States      * *\n") ///
+	.append("* *                 Build Time: ").append(
 	__DATE__).append(" @ ").append(__TIME__).append(" * *\n") ///
 	.append(
-			"----------------------------------------------------------------------------------\n");
+			"----------------------------------------------------------\n");
 	return info;
 }
