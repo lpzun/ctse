@@ -97,10 +97,8 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
 	for (size_t i = 0; i < l_in_out.size(); ++i) {
 		expr lhs(ctx.int_val(0)); // left-hand		side
 		expr rhs(ctx.int_val(0)); // right-hand 	side
-		if (i == Refs::FINAL_TS.get_local()){
-			cout<<Refs::TARGET_THR_NUM<<"--------TARGET_THR_NUM-------------\n";
+		if (i == Refs::FINAL_TS.get_local())
 			rhs = ctx.int_val(Refs::TARGET_THR_NUM);
-		}
 
 		for (auto inc = l_in_out[i].first.begin(); inc != l_in_out[i].first.end(); ++inc)
 			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
