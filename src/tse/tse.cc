@@ -71,15 +71,16 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& 
 	for (auto iphi = c_S.begin(); iphi != c_S.end(); ++iphi)
 	cout << *iphi << "\n";
 #endif
-//
-//	// TODO ----------------------delete-------------------------------------
-//	cout << "(declare-fun " << n_0 << " () Int)" << "\n";
-//	for (uint idx = 0; idx < x_index; ++idx)
-//		cout << "(declare-fun " << x_affix << idx << " () Int)" << "\n";
-//	cout << "(assert \n";
-//	cout << s_solver << "\n";
-//	cout << ")\n";
-//	cout << "(check-sat)" << endl;
+
+	if (Refs::OPT_CONSTRAINT) { /// output constraints
+		cout << "(declare-fun " << n_0 << " () Int)" << "\n";
+		for (uint idx = 0; idx < x_index; ++idx)
+			cout << "(declare-fun " << x_affix << idx << " () Int)" << "\n";
+		cout << "(assert \n";
+		cout << s_solver << "\n";
+		cout << ")\n";
+		cout << "(check-sat)" << endl;
+	}
 
 	return this->check_sat_via_smt_solver();
 }
@@ -96,8 +97,10 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
 	for (size_t i = 0; i < l_in_out.size(); ++i) {
 		expr lhs(ctx.int_val(0)); // left-hand		side
 		expr rhs(ctx.int_val(0)); // right-hand 	side
-		if (i == Refs::FINAL_TS.get_local())
-			rhs = ctx.int_val(1);
+		if (i == Refs::FINAL_TS.get_local()){
+			cout<<Refs::TARGET_THR_NUM<<"--------TARGET_THR_NUM-------------\n";
+			rhs = ctx.int_val(Refs::TARGET_THR_NUM);
+		}
 
 		for (auto inc = l_in_out[i].first.begin(); inc != l_in_out[i].first.end(); ++inc)
 			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
@@ -183,7 +186,7 @@ void tse::parse_sat_solution(const model& m) {
 		if (max_z < z)
 			max_z = z;
 		else
-			max_z+=2;
+			max_z += 2;
 //		cout << "----------max_z---after-----" << max_z << "\n";
 	}
 }

@@ -49,8 +49,8 @@ int main(const int argc, const char * const * const argv) {
 			return 0;
 		}
 
-		Refs::OPT_PRINT_DOT = cmd.arg_bool(cmd_line::prob_inst_opts(),
-				"--ettd2dot");
+//		Refs::OPT_PRINT_DOT = cmd.arg_bool(cmd_line::prob_inst_opts(),
+//				"--ettd2dot");
 		Refs::OPT_PRINT_ADJ = cmd.arg_bool(cmd_line::prob_inst_opts(),
 				"--adj-list");
 
@@ -76,7 +76,7 @@ int main(const int argc, const char * const * const argv) {
 		const bool& is_reachable = u.unbounded_reachability_analysis(filename,
 				initl_ts, final_ts, is_self_loop);
 		cout << "======================================================\n";
-		cout << " " << Refs::FINAL_TS;
+		cout << " (" << Refs::S_FINAL_TS << ")";
 		if (is_reachable)
 			cout << " is reachable: verification failed!\n";
 		else

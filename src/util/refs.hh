@@ -37,6 +37,8 @@ public:
 	static Thread_State INITL_TS;
 	static Thread_State FINAL_TS;
 
+	static string S_FINAL_TS;
+
 	static adj_list original_TTD;
 	static adj_list spawntra_TTD;
 

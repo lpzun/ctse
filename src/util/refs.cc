@@ -35,6 +35,7 @@ bool Refs::OPT_PRINT_ALL = false;
 ushort Refs::TARGET_THR_NUM = 1; /// default is 1
 
 //string Refs::FILE_NAME_PREFIX = "";
+string Refs::S_FINAL_TS = "";
 
 Thread_State Refs::INITL_TS;
 Thread_State Refs::FINAL_TS;

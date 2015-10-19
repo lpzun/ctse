@@ -25,7 +25,8 @@ ura::~ura() {
  * @param s_final
  * @return
  */
-bool ura::unbounded_reachability_analysis(const string& filename, const string& s_initl, const string& s_final,
+bool ura::unbounded_reachability_analysis(const string& filename,
+		const string& s_initl, const string& s_final,
 		const bool& is_self_loop) {
 	Refs::INITL_TS = this->parse_input_tss(s_initl);
 	Refs::FINAL_TS = this->parse_input_tss(s_final);
@@ -43,9 +44,10 @@ Thread_State ura::parse_input_tss(const string& str_ts) {
 	} else { /// str_ts is store in a file
 		ifstream in(str_ts.c_str());
 		if (in.good()) {
-			string s_ts;
-			std::getline(in, s_ts);
-			ts = Util::create_thread_state_from_gs_str(s_ts);
+//			string s_ts;
+			std::getline(in, Refs::S_FINAL_TS);
+//			Refs::S_FINAL_TS = s_ts;
+			ts = Util::create_thread_state_from_gs_str(Refs::S_FINAL_TS);
 			in.close();
 		} else {
 			throw ural_rt_err("read_in_thread_state: unknown input file");
@@ -58,7 +60,8 @@ Thread_State ura::parse_input_tss(const string& str_ts) {
  * @brief parse the input TTD
  * @param filename: the name of input .ttd file
  */
-bool ura::reachability_analysis_via_tse(const string& filename, const bool& is_self_loop) {
+bool ura::reachability_analysis_via_tse(const string& filename,
+		const bool& is_self_loop) {
 	if (filename == "X") { // make random structure
 		throw ural_rt_err("Please assign the input file!");
 	} else {
