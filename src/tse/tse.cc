@@ -307,7 +307,7 @@ bool tse::standard_FWS(const uint& n, const uint& z) {
 				}
 			} else { /// if src == final
 				cout << src << endl;
-				cout << "witness path: " << tau << endl;
+				cout << "covering configuration: " << tau << endl;
 				// this->reproduce_witness_path(tau.pi);
 				return true;
 			}
