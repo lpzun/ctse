@@ -28,15 +28,15 @@ using std::cout;
 using std::endl;
 using std::unique_ptr;
 
-class Arguments {
+class arguments {
 public:
-	inline Arguments(const short& type, const string& short_name,
+	inline arguments(const short& type, const string& short_name,
 			const string& long_name, const string& meaning) :
 			type(type), short_name(short_name), long_name(long_name), meaning(
 					meaning) {
 	}
 
-	inline ~Arguments() {
+	inline ~arguments() {
 	}
 
 	inline const short& get_type() const {
@@ -62,25 +62,25 @@ protected:
 	const string meaning;    /// the meaning of the argument
 };
 
-inline bool operator==(const Arguments& arg1, const Arguments& arg2) {
+inline bool operator==(const arguments& arg1, const arguments& arg2) {
 	return (arg1.get_long_name() == arg2.get_long_name());
 }
 
-inline bool operator<(const Arguments& arg1, const Arguments& arg2) {
+inline bool operator<(const arguments& arg1, const arguments& arg2) {
 	return (arg1.get_long_name() < arg2.get_long_name());
 }
 
-class Options: public Arguments {
+class Options: public arguments {
 public:
 	inline Options(const short& type, const string& short_name,
 			const string& long_name, const string& meaning,
 			const string& default_value) :
-			Arguments(type, short_name, long_name, meaning), value(
+			arguments(type, short_name, long_name, meaning), value(
 					default_value) {
 	}
 
 	inline Options(const short& type = 0, const string& long_name = "") :
-			Arguments(type, "", long_name, "") {
+			arguments(type, "", long_name, "") {
 	}
 
 	inline ~Options() {
@@ -106,15 +106,15 @@ inline bool operator<(const Options& arg1, const Options& arg2) {
 	return (arg1.get_long_name() < arg2.get_long_name());
 }
 
-class Switch: public Arguments {
+class Switch: public arguments {
 public:
 	inline Switch(const short& type, const string& short_name,
 			const string& long_name, const string& meaning) :
-			Arguments(type, short_name, long_name, meaning), value(false) {
+			arguments(type, short_name, long_name, meaning), value(false) {
 	}
 
 	inline Switch(const short& type = 0, const string& long_name = "") :
-			Arguments(type, "", long_name, ""), value(false) {
+			arguments(type, "", long_name, ""), value(false) {
 	}
 
 	inline ~Switch() {

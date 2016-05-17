@@ -10,13 +10,15 @@
 namespace sura {
 
 tse::tse(const id_tran &size_R, const deque<id_tran>& spawns) :
-		ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(ctx.int_val(0)), max_n(0), max_z(0), s_solver(
-				(tactic(ctx, "simplify") & tactic(ctx, "solve-eqs") & tactic(ctx, "smt")).mk_solver()) {
-	/// set up the expression of summarizing all spawn variables
-	for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
-		const id_tran& id = *iv;
-		sum_z = sum_z + ctx.int_const((x_affix + std::to_string(id)).c_str());
-	}
+        ctx(), n_0(ctx.int_const("n0")), x_affix("x"), x_index(size_R), sum_z(
+                ctx.int_val(0)), max_n(0), max_z(0), s_solver(
+                (tactic(ctx, "simplify") & tactic(ctx, "solve-eqs")
+                        & tactic(ctx, "smt")).mk_solver()) {
+    /// set up the expression of summarizing all spawn variables
+    for (auto iv = spawns.begin(); iv != spawns.end(); ++iv) {
+        const id_tran& id = *iv;
+        sum_z = sum_z + ctx.int_const((x_affix + std::to_string(id)).c_str());
+    }
 }
 
 tse::~tse() {
@@ -30,15 +32,16 @@ tse::~tse() {
  * 		true : if reachable
  * 		false: otherwise
  */
-bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out, const vector<inout>& s_in_out) {
-	switch (this->solicit_for_TSE(l_in_out, s_in_out)) {
-	case result::reach:
-		return true;
-	case result::unreach:
-		return false;
-	default: /// unknown
-		return this->solicit_for_CEGAR();
-	}
+bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out,
+        const vector<inout>& s_in_out) {
+    switch (this->solicit_for_TSE(l_in_out, s_in_out)) {
+    case result::reach:
+        return true;
+    case result::unreach:
+        return false;
+    default: /// unknown
+        return this->solicit_for_CEGAR();
+    }
 }
 
 /**
@@ -47,42 +50,44 @@ bool tse::reachability_analysis_via_tse(const vector<inout>& l_in_out, const vec
  * @param s_in_out
  * @return
  */
-result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& s_in_out) {
-	/// add n_0 >= 1
-	s_solver.add(n_0 >= 1);
+result tse::solicit_for_TSE(const vector<inout>& l_in_out,
+        const vector<inout>& s_in_out) {
+    /// add n_0 >= 1
+    s_solver.add(n_0 >= 1);
 
-	/// add x_i >= 0
-	for (uint idx = 0; idx < x_index; ++idx)
-		s_solver.add(ctx.int_const((x_affix + std::to_string(idx)).c_str()) >= 0);
+    /// add x_i >= 0
+    for (uint idx = 0; idx < x_index; ++idx)
+        s_solver.add(
+                ctx.int_const((x_affix + std::to_string(idx)).c_str()) >= 0);
 
-	/// add C_L constraints
-	const auto& c_L = this->build_CL(l_in_out);
-	for (size_t i = 0; i != c_L.size(); ++i)
-		s_solver.add(c_L[i]);
+    /// add C_L constraints
+    const auto& c_L = this->build_CL(l_in_out);
+    for (size_t i = 0; i != c_L.size(); ++i)
+        s_solver.add(c_L[i]);
 
-	/// add C_S constraints
-	const auto& c_S = this->build_CS(s_in_out);
-	for (size_t i = 0; i != c_S.size(); ++i)
-		s_solver.add(c_S[i]);
+    /// add C_S constraints
+    const auto& c_S = this->build_CS(s_in_out);
+    for (size_t i = 0; i != c_S.size(); ++i)
+        s_solver.add(c_S[i]);
 
 #ifndef NDEBUG
-	for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
-	cout << *iphi << "\n";
-	for (auto iphi = c_S.begin(); iphi != c_S.end(); ++iphi)
-	cout << *iphi << "\n";
+    for (auto iphi = c_L.begin(); iphi != c_L.end(); ++iphi)
+    cout << *iphi << "\n";
+    for (auto iphi = c_S.begin(); iphi != c_S.end(); ++iphi)
+    cout << *iphi << "\n";
 #endif
 
-	if (Refs::OPT_CONSTRAINT) { /// output constraints
-		cout << "(declare-fun " << n_0 << " () Int)" << "\n";
-		for (uint idx = 0; idx < x_index; ++idx)
-			cout << "(declare-fun " << x_affix << idx << " () Int)" << "\n";
-		cout << "(assert \n";
-		cout << s_solver << "\n";
-		cout << ")\n";
-		cout << "(check-sat)" << endl;
-	}
+    if (Refs::OPT_CONSTRAINT) { /// output constraints
+        cout << "(declare-fun " << n_0 << " () Int)" << "\n";
+        for (uint idx = 0; idx < x_index; ++idx)
+            cout << "(declare-fun " << x_affix << idx << " () Int)" << "\n";
+        cout << "(assert \n";
+        cout << s_solver << "\n";
+        cout << ")\n";
+        cout << "(check-sat)" << endl;
+    }
 
-	return this->check_sat_via_smt_solver();
+    return this->check_sat_via_smt_solver();
 }
 
 /**
@@ -91,25 +96,27 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out, const vector<inout>& 
  * @return
  */
 vec_expr tse::build_CL(const vector<inout>& l_in_out) {
-	vec_expr phi(Thread_State::L, ctx.int_val(0));
-	phi[Refs::INITL_TS.get_local()] = n_0;
+    vec_expr phi(Thread_State::L, ctx.int_val(0));
+    phi[Refs::INITL_TS.get_local()] = n_0;
 
-	for (size_t i = 0; i < l_in_out.size(); ++i) {
-		expr lhs(ctx.int_val(0)); // left-hand		side
-		expr rhs(ctx.int_val(0)); // right-hand 	side
-		if (i == Refs::FINAL_TS.get_local())
-			rhs = ctx.int_val(Refs::TARGET_THR_NUM);
+    for (size_t i = 0; i < l_in_out.size(); ++i) {
+        expr lhs(ctx.int_val(0)); // left-hand		side
+        expr rhs(ctx.int_val(0)); // right-hand 	side
+        if (i == Refs::FINAL_TS.get_local())
+            rhs = ctx.int_val(Refs::TARGET_THR_NUM);
 
-		for (auto inc = l_in_out[i].first.begin(); inc != l_in_out[i].first.end(); ++inc)
-			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+        for (auto inc = l_in_out[i].first.begin();
+                inc != l_in_out[i].first.end(); ++inc)
+            lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
-		for (auto out = l_in_out[i].second.begin(); out != l_in_out[i].second.end(); ++out)
-			rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
+        for (auto out = l_in_out[i].second.begin();
+                out != l_in_out[i].second.end(); ++out)
+            rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
 
-		phi[i] = (phi[i] + lhs) >= rhs;
-	}
-	DBG_LOC();
-	return phi;
+        phi[i] = (phi[i] + lhs) >= rhs;
+    }
+    DBG_LOC();
+    return phi;
 }
 
 /**
@@ -118,27 +125,29 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
  * @return
  */
 vec_expr tse::build_CS(const vector<inout>& s_in_out) {
-	vec_expr phi(Thread_State::S, ctx.int_val(0));
+    vec_expr phi(Thread_State::S, ctx.int_val(0));
 
-	if (Refs::INITL_TS.get_share() != Refs::FINAL_TS.get_share()) {
-		phi[Refs::INITL_TS.get_share()] = ctx.int_val(1);
-		phi[Refs::FINAL_TS.get_share()] = ctx.int_val(-1);
-	}
+    if (Refs::INITL_TS.get_share() != Refs::FINAL_TS.get_share()) {
+        phi[Refs::INITL_TS.get_share()] = ctx.int_val(1);
+        phi[Refs::FINAL_TS.get_share()] = ctx.int_val(-1);
+    }
 
-	for (size_t i = 0; i < s_in_out.size(); ++i) {
-		expr lhs(ctx.int_val(0)); // left-hand 	side
-		expr rhs(ctx.int_val(0)); // right-hand 	side
+    for (size_t i = 0; i < s_in_out.size(); ++i) {
+        expr lhs(ctx.int_val(0)); // left-hand 	side
+        expr rhs(ctx.int_val(0)); // right-hand 	side
 
-		for (auto inc = s_in_out[i].first.begin(); inc != s_in_out[i].first.end(); ++inc)
-			lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
+        for (auto inc = s_in_out[i].first.begin();
+                inc != s_in_out[i].first.end(); ++inc)
+            lhs = lhs + ctx.int_const((x_affix + std::to_string(*inc)).c_str());
 
-		for (auto out = s_in_out[i].second.begin(); out != s_in_out[i].second.end(); ++out)
-			rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
+        for (auto out = s_in_out[i].second.begin();
+                out != s_in_out[i].second.end(); ++out)
+            rhs = rhs + ctx.int_const((x_affix + std::to_string(*out)).c_str());
 
-		phi[i] = (phi[i] + lhs) == rhs;
-	}
-	DBG_LOC();
-	return phi;
+        phi[i] = (phi[i] + lhs) == rhs;
+    }
+    DBG_LOC();
+    return phi;
 }
 
 /**
@@ -146,18 +155,18 @@ vec_expr tse::build_CS(const vector<inout>& s_in_out) {
  * @return void
  */
 result tse::check_sat_via_smt_solver() {
-	DBG_LOC();
-	switch (s_solver.check()) {
-	case sat:
-		this->parse_sat_solution(s_solver.get_model());
-		if (check_reach_with_fixed_threads(max_n, max_z))
-			return result::reach;
-		return result::unknown;
-	case unsat:
-		return result::unreach;
-	case unknown:
-		throw ural_rt_err("smt solver returns unknow!");
-	}
+    DBG_LOC();
+    switch (s_solver.check()) {
+    case sat:
+        this->parse_sat_solution(s_solver.get_model());
+        if (check_reach_with_fixed_threads(max_n, max_z))
+            return result::reach;
+        return result::unknown;
+    case unsat:
+        return result::unreach;
+    case unknown:
+        throw ural_rt_err("smt solver returns unknow!");
+    }
 }
 
 /**
@@ -166,27 +175,24 @@ result tse::check_sat_via_smt_solver() {
  */
 void tse::parse_sat_solution(const model& m) {
 #ifndef NDEBUG
-	cout << __func__ << "\n";
-	cout << m << endl;
+    cout << __func__ << "\n";
+    cout << m << endl;
 #endif
-	for (size_t i = 0; i < m.size(); i++) {
-		func_decl v = m[i];
-		assert(v.arity() == 0); /// check if contains only constants
-		if (v.name() == n_0.decl().name())
-			if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
-				break;
-	}
+    for (size_t i = 0; i < m.size(); i++) {
+        func_decl v = m[i];
+        assert(v.arity() == 0); /// check if contains only constants
+        if (v.name() == n_0.decl().name())
+            if (Z3_get_numeral_uint(ctx, m.get_const_interp(v), &max_n))
+                break;
+    }
 
-	if (Refs::is_exists_SPAWN) {
-		const auto z = get_z3_const_uint(m.eval(sum_z));
-//		cout << "----------max_z--------" << max_z << "\n";
-//		cout << "----------sum_z--------" << z << "\n";
-		if (max_z < z)
-			max_z = z;
-		else
-			max_z += 2;
-//		cout << "----------max_z---after-----" << max_z << "\n";
-	}
+    if (Refs::is_exists_SPAWN) {
+        const auto z = get_z3_const_uint(m.eval(sum_z));
+        if (max_z < z)
+            max_z = z;
+        else
+            max_z += 2;
+    }
 }
 
 /**
@@ -195,13 +201,13 @@ void tse::parse_sat_solution(const model& m) {
  * @return e's value
  */
 uint tse::get_z3_const_uint(const expr& e) {
-	if (e.is_const()) {
-		uint value = 0;
-		Z3_get_numeral_uint(ctx, e, &value);
-		return value;
-	} else {
-		throw ural_rt_err("get_z3_const_uint: input is not a constant");
-	}
+    if (e.is_const()) {
+        uint value = 0;
+        Z3_get_numeral_uint(ctx, e, &value);
+        return value;
+    } else {
+        throw ural_rt_err("get_z3_const_uint: input is not a constant");
+    }
 }
 
 /**
@@ -211,23 +217,23 @@ uint tse::get_z3_const_uint(const expr& e) {
  * 		false: otherwise
  */
 bool tse::solicit_for_CEGAR() {
-	while (true) { /// CEGAR loop might never terminate
-		/// add incremental constraint
-		s_solver.add(n_0 > ctx.int_val(max_n));
-		if (max_z > 0 && !sum_z.is_int())
-			s_solver.add(sum_z > ctx.int_val(max_z));
+    while (true) { /// CEGAR loop might never terminate
+        /// add incremental constraint
+        s_solver.add(n_0 > ctx.int_val(max_n));
+        if (max_z > 0 && !sum_z.is_int())
+            s_solver.add(sum_z > ctx.int_val(max_z));
 
-		/// apply  incremental solving
-		switch (this->check_sat_via_smt_solver()) {
-		case result::reach:
-			return true;
-		case result::unreach:
-			return false;
-		case result::unknown:
-			break;
-		}
-	}
-	return false;
+        /// apply  incremental solving
+        switch (this->check_sat_via_smt_solver()) {
+        case result::reach:
+            return true;
+        case result::unreach:
+            return false;
+        case result::unknown:
+            break;
+        }
+    }
+    return false;
 }
 
 /**
@@ -241,22 +247,22 @@ bool tse::solicit_for_CEGAR() {
  * 		false: otherwise
  */
 bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
-	/// if there is no spwan transitions, so call standard_FWS
-	if (!Refs::is_exists_SPAWN)
-		return this->standard_FWS(n, z);
+    /// if there is no spwan transitions, so call standard_FWS
+    if (!Refs::is_exists_SPAWN)
+        return this->standard_FWS(n, z);
 
-	/// enumeratively calling standard_FWS over (1, z) ... (n, ..., z)
-	for (unsigned in = 1; in < n; ++in) {
-		if (this->standard_FWS(in, z))
-			return true;
-	}
+    /// enumeratively calling standard_FWS over (1, z) ... (n, ..., z)
+    for (unsigned in = 1; in < n; ++in) {
+        if (this->standard_FWS(in, z))
+            return true;
+    }
 
-	/// enumeratively calling standard_FWS over (n, 1) ... (n, ..., z)
+    /// enumeratively calling standard_FWS over (n, 1) ... (n, ..., z)
 //	for (unsigned iz = 1; iz < z; ++iz) {
 //		if (this->standard_FWS(n, iz))
 //			return true;
 //	}
-	return false;
+    return false;
 }
 
 /**
@@ -271,49 +277,54 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
  * 		false: otherwise
  */
 bool tse::standard_FWS(const uint& n, const uint& z) {
-	auto spw = z;
+    auto spw = z;
 //	cout << "fws: " << n << "               " << z << endl;
-	queue<Global_State, list<Global_State>> W; /// worklist
-	W.push(Global_State(Refs::INITL_TS, n)); /// start from the initial state with n threads
-	set<Global_State> R; /// reachable global states
-	while (!W.empty()) {
-		Global_State tau = W.front();
-		W.pop();
-		const ushort &shared = tau.get_share();
-		for (auto il = tau.get_locals().begin(); il != tau.get_locals().end(); ++il) {
-			Thread_State src(shared, il->first);
-			if (src != Refs::FINAL_TS) {
-				auto ifind = Refs::original_TTD.find(src);
-				if (ifind != Refs::original_TTD.end()) {
-					for (auto idst = ifind->second.begin(); idst != ifind->second.end(); ++idst) {
-						auto locals = tau.get_locals();
-						if (Refs::is_exists_SPAWN && this->is_spawn_transition(src, *idst)) { /// if src +> dst true
-							if (spw > 0) {
-								spw--;
-								locals = this->update_counter(locals, idst->get_local());
-							} else { /// if the we already spawn z times, we can't
-								continue; /// spawn any more and have to skip src +> dst;
-							}
-						} else {
-							locals = this->update_counter(locals, src.get_local(), idst->get_local());
-						}
-						Global_State _tau(idst->get_share(), locals);
-						if (R.insert(_tau).second) {
-							/// record _tau's predecessor tau: for witness
-							//_tau.pi = std::make_shared<Global_State>(tau);
-							W.push(_tau);
-						}
-					}
-				}
-			} else { /// if src == final
-				cout << src << endl;
-				cout << "covering configuration: " << tau << endl;
-				// this->reproduce_witness_path(tau.pi);
-				return true;
-			}
-		}
-	}
-	return false;
+    queue<Global_State, list<Global_State>> W; /// worklist
+    W.push(Global_State(Refs::INITL_TS, n)); /// start from the initial state with n threads
+    set<Global_State> R; /// reachable global states
+    while (!W.empty()) {
+        Global_State tau = W.front();
+        W.pop();
+        const ushort &shared = tau.get_share();
+        for (auto il = tau.get_locals().begin(); il != tau.get_locals().end();
+                ++il) {
+            Thread_State src(shared, il->first);
+            if (src != Refs::FINAL_TS) {
+                auto ifind = Refs::original_TTD.find(src);
+                if (ifind != Refs::original_TTD.end()) {
+                    for (auto idst = ifind->second.begin();
+                            idst != ifind->second.end(); ++idst) {
+                        auto locals = tau.get_locals();
+                        if (Refs::is_exists_SPAWN
+                                && this->is_spawn_transition(src, *idst)) { /// if src +> dst true
+                            if (spw > 0) {
+                                spw--;
+                                locals = this->update_counter(locals,
+                                        idst->get_local());
+                            } else { /// if the we already spawn z times, we can't
+                                continue; /// spawn any more and have to skip src +> dst;
+                            }
+                        } else {
+                            locals = this->update_counter(locals,
+                                    src.get_local(), idst->get_local());
+                        }
+                        Global_State _tau(idst->get_share(), locals);
+                        if (R.insert(_tau).second) {
+                            /// record _tau's predecessor tau: for witness
+                            //_tau.pi = std::make_shared<Global_State>(tau);
+                            W.push(_tau);
+                        }
+                    }
+                }
+            } else { /// if src == final
+                cout << src << endl;
+                cout << "covering configuration: " << tau << endl;
+                // this->reproduce_witness_path(tau.pi);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /**
@@ -322,17 +333,18 @@ bool tse::standard_FWS(const uint& n, const uint& z) {
  * @param inc: local state whose counter is incremented
  * @return local states after updating counters
  */
-map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &inc) {
-	auto _Z = Z;   /// local copy of Z
+map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
+        const ushort &inc) {
+    auto _Z = Z;   /// local copy of Z
 
-	auto iinc = _Z.find(inc);
-	if (iinc != _Z.end()) {
-		iinc->second++;
-	} else {
-		_Z[inc] = 1;
-	}
+    auto iinc = _Z.find(inc);
+    if (iinc != _Z.end()) {
+        iinc->second++;
+    } else {
+        _Z[inc] = 1;
+    }
 
-	return _Z;
+    return _Z;
 }
 
 /**
@@ -342,29 +354,30 @@ map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const usho
  * @param inc: local state whose counter is incremented
  * @return local states after updating counters
  */
-map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const ushort &dec, const ushort &inc) {
-	if (dec == inc) /// if dec == inc
-		return Z;
+map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
+        const ushort &dec, const ushort &inc) {
+    if (dec == inc) /// if dec == inc
+        return Z;
 
-	auto _Z = Z;   /// local copy of Z
+    auto _Z = Z;   /// local copy of Z
 
-	auto idec = _Z.find(dec);
-	if (idec != _Z.end()) {
-		idec->second--;
-		if (idec->second == 0)
-			_Z.erase(idec);
-	} else {
-		throw ural_rt_err("FWS::update_counter: local state misses");
-	}
+    auto idec = _Z.find(dec);
+    if (idec != _Z.end()) {
+        idec->second--;
+        if (idec->second == 0)
+            _Z.erase(idec);
+    } else {
+        throw ural_rt_err("FWS::update_counter: local state misses");
+    }
 
-	auto iinc = _Z.find(inc);
-	if (iinc != _Z.end()) {
-		iinc->second++;
-	} else {
-		_Z[inc] = 1;
-	}
+    auto iinc = _Z.find(inc);
+    if (iinc != _Z.end()) {
+        iinc->second++;
+    } else {
+        _Z[inc] = 1;
+    }
 
-	return _Z;
+    return _Z;
 }
 
 /**
@@ -376,17 +389,18 @@ map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z, const usho
  * 			true : src +> dst
  * 			false: otherwise
  */
-bool tse::is_spawn_transition(const Thread_State& src, const Thread_State& dst) {
-	auto ifind = Refs::spawntra_TTD.find(src);
-	if (ifind == Refs::spawntra_TTD.end()) {
-		return false;
-	} else {
-		auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);
-		if (ifnd == ifind->second.end())
-			return false;
-		else
-			return true;
-	}
+bool tse::is_spawn_transition(const Thread_State& src,
+        const Thread_State& dst) {
+    auto ifind = Refs::spawntra_TTD.find(src);
+    if (ifind == Refs::spawntra_TTD.end()) {
+        return false;
+    } else {
+        auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);
+        if (ifnd == ifind->second.end())
+            return false;
+        else
+            return true;
+    }
 }
 
 } /* namespace sura */

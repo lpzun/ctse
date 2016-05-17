@@ -11,11 +11,11 @@
 
 namespace COMPARE {
 short compare(clong& x, clong& y) {
-	if (x < y)
-		return -1;
-	if (x > y)
-		return +1;
-	return 0;
+    if (x < y)
+        return -1;
+    if (x > y)
+        return +1;
+    return 0;
 }
 
 /**
@@ -23,30 +23,31 @@ short compare(clong& x, clong& y) {
  * @param m1
  * @param m2
  */
-short compare_map(const map<ushort, ushort>& m1, const map<ushort, ushort>& m2) {
-	auto s1_iter = m1.begin(), s1_end = m1.end();
-	auto s2_iter = m2.begin(), s2_end = m2.end();
-	while (true) {
-		if (s1_iter == s1_end && s2_iter == s2_end) {
-			return 0;
-		} else if (s1_iter == s1_end) {
-			return -1;
-		} else if (s2_iter == s2_end) {
-			return 1;
-		} else if (s1_iter->first < s2_iter->first) {
-			return -1;
-		} else if (s1_iter->first > s2_iter->first) {
-			return 1;
-		} else if (s1_iter->first == s2_iter->first) {
-			if (s1_iter->second < s2_iter->second) {
-				return -1;
-			} else if (s1_iter->second > s2_iter->second) {
-				return 1;
-			}
-		}
-		s1_iter++, s2_iter++;
-	}
-	throw ural_rt_err("COMPARE::compare: internal");
+short compare_map(const map<ushort, ushort>& m1,
+        const map<ushort, ushort>& m2) {
+    auto s1_iter = m1.begin(), s1_end = m1.end();
+    auto s2_iter = m2.begin(), s2_end = m2.end();
+    while (true) {
+        if (s1_iter == s1_end && s2_iter == s2_end) {
+            return 0;
+        } else if (s1_iter == s1_end) {
+            return -1;
+        } else if (s2_iter == s2_end) {
+            return 1;
+        } else if (s1_iter->first < s2_iter->first) {
+            return -1;
+        } else if (s1_iter->first > s2_iter->first) {
+            return 1;
+        } else if (s1_iter->first == s2_iter->first) {
+            if (s1_iter->second < s2_iter->second) {
+                return -1;
+            } else if (s1_iter->second > s2_iter->second) {
+                return 1;
+            }
+        }
+        s1_iter++, s2_iter++;
+    }
+    throw ural_rt_err("COMPARE::compare: internal");
 }
 
 /**
@@ -59,21 +60,22 @@ short compare_map(const map<ushort, ushort>& m1, const map<ushort, ushort>& m2) 
  */
 template<class T>
 short compare_container(const T& x, const T& y) {
-	typename T::const_iterator xi = x.begin(), yi = y.begin(), x_end = x.end(), y_end = y.end();
-	while (true) {
-		if (xi == x_end && yi == y_end) // x == y
-			return 0;
-		else if (xi == x_end)                // x < y
-			return -1;
-		else if (yi == y_end)                // y < x
-			return +1;
-		else if (*xi < *yi)                  // x < y
-			return -1;
-		else if (*yi < *xi)                  // y < x
-			return +1;
-		++xi, ++yi;
-	}
-	throw ural_rt_err("COMPARE::compare: internal");
+    typename T::const_iterator xi = x.begin(), yi = y.begin(), x_end = x.end(),
+            y_end = y.end();
+    while (true) {
+        if (xi == x_end && yi == y_end) // x == y
+            return 0;
+        else if (xi == x_end)                // x < y
+            return -1;
+        else if (yi == y_end)                // y < x
+            return +1;
+        else if (*xi < *yi)                  // x < y
+            return -1;
+        else if (*yi < *xi)                  // y < x
+            return +1;
+        ++xi, ++yi;
+    }
+    throw ural_rt_err("COMPARE::compare: internal");
 }
 }
 
@@ -88,9 +90,9 @@ namespace PPRINT {
  * @return a vector of string
  */
 vector<string> split(const string &s, const char& delim) {
-	vector<string> elems;
-	split(s, delim, elems);
-	return elems;
+    vector<string> elems;
+    split(s, delim, elems);
+    return elems;
 }
 
 /**
@@ -101,29 +103,29 @@ vector<string> split(const string &s, const char& delim) {
  * @return a vector of string
  */
 vector<string> split(const string &s, char delim, vector<string> &elems) {
-	std::stringstream ss(s);
-	string item;
-	while (std::getline(ss, item, delim)) {
-		elems.emplace_back(item);
-	}
-	return elems;
+    std::stringstream ss(s);
+    string item;
+    while (std::getline(ss, item, delim)) {
+        elems.emplace_back(item);
+    }
+    return elems;
 }
 
 template<class T>
 string width(const T& x, cushort& width) {
-	std::ostringstream os;
-	os << x;
-	string s = os.str();
+    std::ostringstream os;
+    os << x;
+    string s = os.str();
 
-	vector<string> ss = split(s, '\n');
-	if (ss.size() <= 1)
-		return s;
+    vector<string> ss = split(s, '\n');
+    if (ss.size() <= 1)
+        return s;
 
-	string result = ss[0];
-	for (int i = 1; i < ss.size(); i++) {
-		result.append("\n").append(string(width, ' ')).append(ss[i]);
-	}
-	return result;
+    string result = ss[0];
+    for (int i = 1; i < ss.size(); i++) {
+        result.append("\n").append(string(width, ' ')).append(ss[i]);
+    }
+    return result;
 }
 
 /**
@@ -134,15 +136,16 @@ string width(const T& x, cushort& width) {
  * @param tab
  * @return
  */
-string tabularize(const string& s, const string& sep, const unsigned short& tab) {
-	string result;
-	ushort n = s.size();
-	for (int i = 0; i < n; ++i) {
-		if (i > 0 && (n - i) % tab == 0)
-			result += (s[i - 1] == ' ' || s[i] == ' ' ? " " : sep);
-		result += s[i];
-	}
-	return result;
+string tabularize(const string& s, const string& sep,
+        const unsigned short& tab) {
+    string result;
+    ushort n = s.size();
+    for (int i = 0; i < n; ++i) {
+        if (i > 0 && (n - i) % tab == 0)
+            result += (s[i - 1] == ' ' || s[i] == ' ' ? " " : sep);
+        result += s[i];
+    }
+    return result;
 }
 
 /**
@@ -156,11 +159,11 @@ string tabularize(const string& s, const string& sep, const unsigned short& tab)
  */
 template<class T>
 string formatString(const T& x, const string& format, cushort& length) {
-	char* s = new char[length];
-	snprintf(s, length, format.c_str(), x);
-	string result = s;
-	delete s;
-	return result;
+    char* s = new char[length];
+    snprintf(s, length, format.c_str(), x);
+    string result = s;
+    delete s;
+    return result;
 }
 
 /**
@@ -172,19 +175,20 @@ string formatString(const T& x, const string& format, cushort& length) {
  * @return
  */
 string hourize(culong& seconds) {
-	if (seconds < 60)
-		return widthify(seconds) + "s";
-	else if (seconds < 3600) { // 60 <= seconds < 3600
-		ushort m = seconds / 60;
-		ushort s = seconds % 60;
-		return widthify(m) + ":" + widthify(s, 2, RIGHTJUST, '0') + "m";
-	} else {                     // 3600 <= seconds < infty
-		ushort h = seconds / 3600;
-		ushort s = seconds % 3600;
-		ushort m = s / 60;
-		s = s % 60;
-		return widthify(h) + ":" + widthify(m, 2, RIGHTJUST, '0') + ":" + widthify(s, 2, RIGHTJUST, '0') + "h";
-	}
+    if (seconds < 60)
+        return widthify(seconds) + "s";
+    else if (seconds < 3600) { // 60 <= seconds < 3600
+        ushort m = seconds / 60;
+        ushort s = seconds % 60;
+        return widthify(m) + ":" + widthify(s, 2, RIGHTJUST, '0') + "m";
+    } else {                     // 3600 <= seconds < infty
+        ushort h = seconds / 3600;
+        ushort s = seconds % 3600;
+        ushort m = s / 60;
+        s = s % 60;
+        return widthify(h) + ":" + widthify(m, 2, RIGHTJUST, '0') + ":"
+                + widthify(s, 2, RIGHTJUST, '0') + "h";
+    }
 }
 
 /**
@@ -200,10 +204,11 @@ string hourize(culong& seconds) {
  * @param common
  * @return
  */
-string firstTimeOrNot(bool& firstTime, const string& connective, const string& common) {
-	string result = (firstTime ? common : connective + common);
-	firstTime = false;
-	return result;
+string firstTimeOrNot(bool& firstTime, const string& connective,
+        const string& common) {
+    string result = (firstTime ? common : connective + common);
+    firstTime = false;
+    return result;
 }
 }                     /// end of PPRINT
 

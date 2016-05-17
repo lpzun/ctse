@@ -29,8 +29,8 @@
 
 class Debug {
 public:
-	Debug();
-	virtual ~Debug();
+    Debug();
+    ~Debug();
 };
 
 #endif /* DEBUG_HH_ */

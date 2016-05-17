@@ -1,27 +1,29 @@
-/**===========================================================================================
- * @note        I am rewriting the URSULA on this project. I am trying to use more generic
- * 				programming techniques. This may spend some time. Not in a rush.
+/**============================================================================
+ * @name      : CTSE
+ * 					C++ version Thread-State Equation
+ * 				Unbounded-Thread Program Verification using Thread-State Equations
  *
- * @name       	: URSULA
- * 					Unbounded-thread Reachability via Symbolic execUtion and Loop Acceleration
- * @author     	: Peizun Liu
- * @version    	: v0.2
- * @copyright  	: The copy right belong to CAV group in CCIS NU
- * @brief		: We present a new approach to reachability analysis for communicating
- * 				finite-state threads that formulates the analysis as a logical decision
- * 				problem. In addition to the unbounded number of running threads, the
- * 				difficulty in making such approaches sound has traditionally been the
- * 				existence of unbounded loops in the program executed by a thread.
- * 				We show in this paper how loop iterations can be summarized into
- * 				Presburger arithmetic constraints. The constraints are defined over a
- * 				single-threaded abstract program and are satisfiable exactly if the original
- * 				unbounded-thread reachability problem has a solution. An advantage of
- * 				our approach is that the purely static analysis involved in building the
- * 				Presburger formula can often reveal its (un-)satisfiability, practically in
- * 				zero time, before any kind of arithmetic has been performed.
- * 				We demonstrate the power of this technique for checking safety properties
- * 				of unbounded-thread programs and infinite-state transition systems.
- *==========================================================================================*/
+ * @author    : Peizun Liu
+ * @version   : v1.0.1
+ * @copyright : The copy right belong to CAV group in CCIS NU
+ * @brief     : Infinite-state reachability problems arising from unbounded-
+ *              thread program verification are of great practical importance,
+ *              yet algo- rithmically hard. Despite the remarkable success of
+ *              explicit-state explo- ration methods to solve such problems,
+ *              there is a sense that SMT technology can be beneficial to speed
+ *              up the decision making. This vision was pioneered in recent
+ *              work by Esparza et al. on SMT-based coverabil- ity analysis of
+ *              Petri nets. We present here an approximate coverability method
+ *              that operates on thread-transition systems, a model naturally
+ *              derived from predicate abstractions of multi-threaded programs.
+ *              In addition to successfully proving uncoverability for all our
+ *              safe benchmark programs, our approach extends previous work by
+ *              the ability to decide the unsafety of many unsafe programs, and
+ *              to provide a witness path. We also demonstrate experimentally
+ *              that our method beats all leading explicit-state techniques on
+ *              safe benchmarks and is competitive on unsafe ones, promising to
+ *              be a very accurate and fast coverability analyzer
+ *===========================================================================*/
 
 #include <iostream>
 
@@ -49,8 +51,6 @@ int main(const int argc, const char * const * const argv) {
 			return 0;
 		}
 
-//		Refs::OPT_PRINT_DOT = cmd.arg_bool(cmd_line::prob_inst_opts(),
-//				"--ettd2dot");
 		Refs::OPT_PRINT_ADJ = cmd.arg_bool(cmd_line::prob_inst_opts(),
 				"--adj-list");
 

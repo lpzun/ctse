@@ -8,9 +8,10 @@
 #include "cmd.hh"
 
 cmd_line::cmd_line() :
-		SHORT_HELP_OPT("-h"), LONG_HELP_OPT("--help"), SHORT_VERSION_OPT("-v"), LONG_VERSION_OPT("--version"), VERSION(
-				"v1.0"), name_width(0), help_message(
-				"Use " + string(SHORT_HELP_OPT) + " or " + string(LONG_HELP_OPT) + " for help"), v_info(), options(), switches(), types() {
+		SHORT_HELP_OPT("-h"), LONG_HELP_OPT("--help"), SHORT_VERSION_OPT("-v"), LONG_VERSION_OPT(
+				"--version"), VERSION("v1.0"), name_width(0), help_message(
+				"Use " + string(SHORT_HELP_OPT) + " or " + string(LONG_HELP_OPT)
+						+ " for help"), v_info(), options(), switches(), types() {
 	this->create_argument_list();
 }
 
@@ -23,7 +24,8 @@ cmd_line::~cmd_line() {
  * @param argc
  * @param argv
  */
-void cmd_line::get_command_line(const int argc, const char* const * const argv) {
+void cmd_line::get_command_line(const int argc,
+		const char* const * const argv) {
 	vector<string> args(argc - 1);
 	for (int i = 0; i < argc - 1; i++)
 		args[i] = argv[i + 1];
@@ -35,7 +37,8 @@ void cmd_line::get_command_line(const int argc, const char* const * const argv) 
  * @param prog
  * @param args
  */
-void cmd_line::get_command_line(const string& prog, const vector<string>& args) {
+void cmd_line::get_command_line(const string& prog,
+		const vector<string>& args) {
 	for (auto iarg = args.begin(), iend = args.end(); iarg != iend; ++iarg) {
 		const string& arg = *iarg;
 		if (arg == SHORT_HELP_OPT || arg == LONG_HELP_OPT) {
@@ -49,8 +52,10 @@ void cmd_line::get_command_line(const string& prog, const vector<string>& args) 
 			for (ushort i = 0; i < types.size() && flag; ++i) {
 				auto iopts = options.find(i);
 				if (iopts != options.end())
-					for (auto iopt = iopts->second.begin(); iopt != iopts->second.end() && flag; ++iopt) {
-						if (arg == iopt->get_short_name() || arg == iopt->get_long_name()) {
+					for (auto iopt = iopts->second.begin();
+							iopt != iopts->second.end() && flag; ++iopt) {
+						if (arg == iopt->get_short_name()
+								|| arg == iopt->get_long_name()) {
 							++iarg;   /// the next string is the value for arg
 							iopt->set_value(*iarg);
 							if (flag)
@@ -60,8 +65,10 @@ void cmd_line::get_command_line(const string& prog, const vector<string>& args) 
 
 				auto iswts = switches.find(i);
 				if (iswts != switches.end())
-					for (auto iswt = iswts->second.begin(); iswt != iswts->second.end() && flag; ++iswt) {
-						if (arg == iswt->get_short_name() || arg == iswt->get_long_name()) {
+					for (auto iswt = iswts->second.begin();
+							iswt != iswts->second.end() && flag; ++iswt) {
+						if (arg == iswt->get_short_name()
+								|| arg == iswt->get_long_name()) {
 							iswt->set_value(true);
 							if (flag)
 								flag = false;
@@ -71,7 +78,9 @@ void cmd_line::get_command_line(const string& prog, const vector<string>& args) 
 			}
 			if (flag)
 				throw ural_rt_err(
-						"Cmd_Line::get_command_line: " + arg + ": no such keyword argument.\n" + help_message);
+						"Cmd_Line::get_command_line: " + arg
+								+ ": no such keyword argument.\n"
+								+ help_message);
 		}
 	}
 }
@@ -84,9 +93,11 @@ void cmd_line::get_command_line(const string& prog, const vector<string>& args) 
  * @param meaning
  * @param default_value
  */
-void cmd_line::add_option(const short& type, const string& short_name, const string& long_name, const string& meaning,
+void cmd_line::add_option(const short& type, const string& short_name,
+		const string& long_name, const string& meaning,
 		const string& default_value) {
-	this->options[type].push_back(Options(type, short_name, long_name, meaning, default_value));
+	this->options[type].push_back(
+			Options(type, short_name, long_name, meaning, default_value));
 
 	if (name_width < short_name.size() + long_name.size() + 10)
 		this->name_width = short_name.size() + long_name.size() + 10;
@@ -99,8 +110,10 @@ void cmd_line::add_option(const short& type, const string& short_name, const str
  * @param long_name
  * @param meaning
  */
-void cmd_line::add_switch(const short& type, const string& short_name, const string& long_name, const string& meaning) {
-	this->switches[type].push_back(Switch(type, short_name, long_name, meaning));
+void cmd_line::add_switch(const short& type, const string& short_name,
+		const string& long_name, const string& meaning) {
+	this->switches[type].push_back(
+			Switch(type, short_name, long_name, meaning));
 	if (name_width < short_name.size() + long_name.size() + 10)
 		this->name_width = short_name.size() + long_name.size() + 10;
 }
@@ -112,7 +125,8 @@ void cmd_line::add_switch(const short& type, const string& short_name, const str
  * @return bool
  */
 bool cmd_line::arg_bool(const unsigned short& type, const string& arg) {
-	auto ifind = std::find(switches[type].begin(), switches[type].end(), Switch(type, arg));
+	auto ifind = std::find(switches[type].begin(), switches[type].end(),
+			Switch(type, arg));
 	if (ifind == switches[type].end())
 		throw ural_rt_err("Cmd_Line:: argument " + arg + " does not exist!"); //TODO add
 	return ifind->is_value();
@@ -125,7 +139,8 @@ bool cmd_line::arg_bool(const unsigned short& type, const string& arg) {
  * @return string: the value of argument
  */
 string cmd_line::arg_value(const short& type, const string& arg) {
-	auto ifind = std::find(options[type].begin(), options[type].end(), Options(type, arg));
+	auto ifind = std::find(options[type].begin(), options[type].end(),
+			Options(type, arg));
 	if (ifind == options[type].end())
 		throw ural_rt_err("Cmd_Line:: argument " + arg + " does not exist!"); //TODO add
 	return ifind->get_value();
@@ -137,37 +152,51 @@ string cmd_line::arg_value(const short& type, const string& arg) {
  * @param indent
  * @param out
  */
-void cmd_line::print_usage_info(const string& prog_name, cushort& indent, ostream& out) const {
+void cmd_line::print_usage_info(const string& prog_name, cushort& indent,
+		ostream& out) const {
 	out << "\n";
 	out << v_info << "\n";
 
 	out << PPRINT::widthify("Usage:", this->name_width, PPRINT::LEFTJUST)
 			<< PPRINT::widthify("Purpose:", PPRINT::LEFTJUST) << "\n";
 	out << " "
-			<< PPRINT::widthify(prog_name + " " + SHORT_HELP_OPT + " [" + LONG_HELP_OPT + "]", this->name_width,
-					PPRINT::LEFTJUST) << PPRINT::widthify("show help message", PPRINT::LEFTJUST) << "\n";
-	out << " " << PPRINT::widthify(prog_name + " -f source.tts ", this->name_width, PPRINT::LEFTJUST)
+			<< PPRINT::widthify(
+					prog_name + " " + SHORT_HELP_OPT + " [" + LONG_HELP_OPT
+							+ "]", this->name_width, PPRINT::LEFTJUST)
+			<< PPRINT::widthify("show help message", PPRINT::LEFTJUST) << "\n";
+	out << " "
+			<< PPRINT::widthify(prog_name + " -f source.bp ", this->name_width,
+					PPRINT::LEFTJUST)
 			<< PPRINT::widthify("-a source.prop", PPRINT::LEFTJUST) << "\n";
 
 	for (size_t i = 0; i < types.size(); i++) {
 		out << types[i] << "\n";
 		auto iopts = options.find(i);
 		if (iopts != options.end())
-			for (auto iopt = iopts->second.begin(); iopt != iopts->second.end(); ++iopt) {
+			for (auto iopt = iopts->second.begin(); iopt != iopts->second.end();
+					++iopt) {
 				out << " "
-						<< PPRINT::widthify(iopt->get_short_name() + " [" + iopt->get_long_name() + "] arg",
+						<< PPRINT::widthify(
+								iopt->get_short_name() + " ["
+										+ iopt->get_long_name() + "] arg",
 								this->name_width, PPRINT::LEFTJUST)
-						<< PPRINT::widthify(PPRINT::widthify(iopt->get_meaning(), this->name_width + 2),
-								PPRINT::LEFTJUST) << "\n";
+						<< PPRINT::widthify(
+								PPRINT::widthify(iopt->get_meaning(),
+										this->name_width + 2), PPRINT::LEFTJUST)
+						<< "\n";
 			}
 
 		auto iswts = switches.find(i);
 		if (iswts != switches.end())
-			for (auto iswt = iswts->second.begin(); iswt != iswts->second.end(); ++iswt) {
+			for (auto iswt = iswts->second.begin(); iswt != iswts->second.end();
+					++iswt) {
 				out << " "
-						<< PPRINT::widthify(iswt->get_short_name() + " [" + iswt->get_long_name() + "]",
+						<< PPRINT::widthify(
+								iswt->get_short_name() + " ["
+										+ iswt->get_long_name() + "]",
 								this->name_width, PPRINT::LEFTJUST)
-						<< PPRINT::widthify(iswt->get_meaning(), PPRINT::LEFTJUST) << "\n";
+						<< PPRINT::widthify(iswt->get_meaning(),
+								PPRINT::LEFTJUST) << "\n";
 			}
 
 		out << endl;
@@ -187,16 +216,21 @@ void cmd_line::create_argument_list() {
 	v_info = create_version_info();
 
 	this->set_types(types);
-	this->add_switch(default_opts(), SHORT_HELP_OPT, LONG_HELP_OPT, "help information");
+	this->add_switch(default_opts(), SHORT_HELP_OPT, LONG_HELP_OPT,
+			"help information");
 //	this->add_switch(default_opts(), "-stat", "--statistics",
 //			"show statistic information");
 
 	/// problem instance
-	this->add_option(prob_inst_opts(), "-f", "--input-file", "thread-state transition diagram (.ttd file)", "X");
-	this->add_option(prob_inst_opts(), "-a", "--target", "a target thread state (e.g., 0|0)", "0|0");
-	this->add_option(prob_inst_opts(), "-i", "--initial", "an initial thread state (e.g., 0|0)", "0|0");
+	this->add_option(prob_inst_opts(), "-f", "--input-file",
+			"thread-state transition diagram (.ttd file)", "X");
+	this->add_option(prob_inst_opts(), "-a", "--target",
+			"a target thread state (e.g., 0|0)", "0|0");
+	this->add_option(prob_inst_opts(), "-i", "--initial",
+			"an initial thread state (e.g., 0|0)", "0|0");
 
-	this->add_switch(prob_inst_opts(), "-l", "--adj-list", "show the adjacency list");
+	this->add_switch(prob_inst_opts(), "-l", "--adj-list",
+			"show the adjacency list");
 //	this->add_switch(prob_inst_opts(), "-dot", "--ettd2dot",
 //			"output generated expanded TTD to a .dot file");
 
@@ -205,16 +239,22 @@ void cmd_line::create_argument_list() {
 //			"the number of threads at initial state", "1");
 //	this->add_option(exp_mode_opts(), "-z", "--spawn-threads",
 //			"the maximal number of spawn threads", "0");
-	this->add_switch(exp_mode_opts(), "-vs", "--self-loop", "keep the self-loops");
+	this->add_switch(exp_mode_opts(), "-vs", "--self-loop",
+			"keep the self-loops");
 
-	this->add_switch(exp_mode_opts(), "-ce", "--counterexample", "show counterexample");
-	this->add_switch(exp_mode_opts(), "-cs", "--constraint", "output intermediate constraints");
+	this->add_switch(exp_mode_opts(), "-ce", "--counterexample",
+			"show counterexample");
+	this->add_switch(exp_mode_opts(), "-cs", "--constraint",
+			"output intermediate constraints");
 	/// SMT Solver options
 
 	/// other options
-	this->add_switch(other_opts(), "-cmd", "--cmd-line", "show the command line");
-	this->add_switch(other_opts(), "-all", "--all", "show all of above messages");
-	this->add_switch(other_opts(), SHORT_VERSION_OPT, LONG_VERSION_OPT, "show version information and exit");
+	this->add_switch(other_opts(), "-cmd", "--cmd-line",
+			"show the command line");
+	this->add_switch(other_opts(), "-all", "--all",
+			"show all of above messages");
+	this->add_switch(other_opts(), SHORT_VERSION_OPT, LONG_VERSION_OPT,
+			"show version information and exit");
 }
 
 string cmd_line::create_version_info() {
@@ -224,7 +264,9 @@ string cmd_line::create_version_info() {
 	.append("* *      _/            _/                _/            * *\n") ///
 	.append("* *     _/              _/_/_/          _/_/_/_/       * *\n") ///
 	.append("* *    _/                   _/         _/              * *\n") ///
-	.append("* *   _/            _/_/_/_/          _/_/_/_/    " + VERSION + " * *\n") ///
+	.append(
+			"* *   _/            _/_/_/_/          _/_/_/_/    " + VERSION
+					+ " * *\n") ///
 	.append("----------------------------------------------------------\n") ///
 	.append("* *        Unbounded-Thread Program Verification       * *\n") ///
 	.append("* *            using Thread-State Equations            * *\n")	///
