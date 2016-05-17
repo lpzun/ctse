@@ -28,8 +28,8 @@ ura::~ura() {
 bool ura::unbounded_reachability_analysis(const string& filename,
         const string& s_initl, const string& s_final,
         const bool& is_self_loop) {
-    Refs::INITL_TS = this->parse_input_tss(s_initl);
-    Refs::FINAL_TS = this->parse_input_tss(s_final);
+    refs::INITL_TS = this->parse_input_tss(s_initl);
+    refs::FINAL_TS = this->parse_input_tss(s_final);
     return this->reachability_analysis_via_tse(filename, is_self_loop);
 }
 
@@ -37,17 +37,17 @@ bool ura::unbounded_reachability_analysis(const string& filename,
  * @brief parse the input initial and final thread state
  * @param str_ts: the thread state represented by string
  */
-Thread_State ura::parse_input_tss(const string& str_ts) {
-    Thread_State ts;
+thread_state ura::parse_input_tss(const string& str_ts) {
+    thread_state ts;
     if (str_ts.find('|') != std::string::npos) {
-        ts = Util::create_thread_state_from_gs_str(str_ts);
+        ts = util::create_thread_state_from_gs_str(str_ts);
     } else { /// str_ts is store in a file
         ifstream in(str_ts.c_str());
         if (in.good()) {
 //			string s_ts;
-            std::getline(in, Refs::S_FINAL_TS);
+            std::getline(in, refs::S_FINAL_TS);
 //			Refs::S_FINAL_TS = s_ts;
-            ts = Util::create_thread_state_from_gs_str(Refs::S_FINAL_TS);
+            ts = util::create_thread_state_from_gs_str(refs::S_FINAL_TS);
             in.close();
         } else {
             throw ural_rt_err("read_in_thread_state: unknown input file");
@@ -69,31 +69,31 @@ bool ura::reachability_analysis_via_tse(const string& filename,
         ifstream org_in(filename.c_str());
         if (!org_in.good())
             throw ural_rt_err("Input file does not find!");
-        Parser::remove_comments(org_in, "/tmp/tmp.ttd.no_comment", "#");
+        parser::remove_comments(org_in, "/tmp/tmp.ttd.no_comment", "#");
         org_in.close();
 
         /// new input file after removing comments
         ifstream new_in("/tmp/tmp.ttd.no_comment");
 
-        new_in >> Thread_State::S >> Thread_State::L;
+        new_in >> thread_state::S >> thread_state::L;
 
         /// store all incoming & outgoing transitions from same local state
         /// key is the shared state,
         ///        first  value is the set of incoming transition id
         ///        second value is the set of outgoing transition id
-        vector<inout> l_in_out(Thread_State::L);
+        vector<inout> l_in_out(thread_state::L);
 
         /// store all incoming & outgoing transitions from same shared state
         /// key is the shared state,
         ///        first  value is the set of incoming transition id
         ///        second value is the set of outgoing transition id
-        vector<inout> s_in_out(Thread_State::S);
+        vector<inout> s_in_out(thread_state::S);
 
         id_tran transition_ID = 0;  /// define unique transition ID
         deque<id_tran> spawn_vars;
 
-        Shared_State s1, s2;              /// shared states
-        Local_State l1, l2;               /// local  states
+        shared_state s1, s2;              /// shared states
+        local_state l1, l2;               /// local  states
         string sep;                       /// separator
         while (new_in >> s1 >> l1 >> sep >> s2 >> l2) {
             DBG_STD(
@@ -103,8 +103,8 @@ bool ura::reachability_analysis_via_tse(const string& filename,
                 continue;
 
             if (sep == "->" || sep == "+>") {
-                const Thread_State src_TS(s1, l1);
-                const Thread_State dst_TS(s2, l2);
+                const thread_state src_TS(s1, l1);
+                const thread_state dst_TS(s2, l2);
 
                 l_in_out[l1].second.emplace_back(transition_ID);
                 l_in_out[l2].first.emplace_back(transition_ID);
@@ -115,12 +115,12 @@ bool ura::reachability_analysis_via_tse(const string& filename,
                 }
 
                 if (sep == "+>") {
-                    if (!Refs::is_exists_SPAWN)
-                        Refs::is_exists_SPAWN = true;
-                    Refs::spawntra_TTD[src_TS].emplace_back(dst_TS);
+                    if (!refs::is_exists_SPAWN)
+                        refs::is_exists_SPAWN = true;
+                    refs::spawntra_TTD[src_TS].emplace_back(dst_TS);
                     spawn_vars.emplace_back(transition_ID);
                 }
-                Refs::original_TTD[src_TS].emplace_back(dst_TS);
+                refs::original_TTD[src_TS].emplace_back(dst_TS);
 
                 transition_ID++; /// increment unique transition ID
             } else {
@@ -131,8 +131,8 @@ bool ura::reachability_analysis_via_tse(const string& filename,
 
 #ifndef NDEBUG
         cout << __func__ << "\n";
-        cout << "Initial Thread State " << Refs::INITL_TS << "\t";
-        cout << "Final Thread State " << Refs::FINAL_TS << "\n";
+        cout << "Initial Thread State " << refs::INITL_TS << "\t";
+        cout << "Final Thread State " << refs::FINAL_TS << "\n";
 
         for (size_t is = 0; is < l_in_out.size(); ++is) {
             cout << "local state: " << is << " ";
@@ -161,9 +161,9 @@ bool ura::reachability_analysis_via_tse(const string& filename,
         DBG_LOC();
 #endif
 
-        if (Refs::OPT_PRINT_ADJ || Refs::OPT_PRINT_ALL) {
+        if (refs::OPT_PRINT_ADJ || refs::OPT_PRINT_ALL) {
             cout << "The original TTD:" << endl;
-            Util::print_adj_list(Refs::original_TTD);
+            util::print_adj_list(refs::original_TTD);
             cout << endl;
         }
 

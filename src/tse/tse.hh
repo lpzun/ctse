@@ -64,7 +64,7 @@ private:
             const ushort &inc);
     map<ushort, ushort> update_counter(const map<ushort, ushort> &Z,
             const ushort &dec, const ushort &inc);
-    bool is_spawn_transition(const Thread_State& src, const Thread_State& dst);
+    bool is_spawn_transition(const thread_state& src, const thread_state& dst);
 };
 
 } /* namespace sura */

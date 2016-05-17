@@ -23,7 +23,7 @@ public:
             const bool& is_self_loop);
 
 private:
-    Thread_State parse_input_tss(const string& str_ts);
+    thread_state parse_input_tss(const string& str_ts);
     bool reachability_analysis_via_tse(const string& filename,
             const bool& is_self_loop);
 };

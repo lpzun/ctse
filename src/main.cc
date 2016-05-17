@@ -4,7 +4,7 @@
  * 				Unbounded-Thread Program Verification using Thread-State Equations
  *
  * @author    : Peizun Liu
- * @version   : v1.0.1
+ * @version   : v1.1
  * @copyright : The copy right belong to CAV group in CCIS NU
  * @brief     : Infinite-state reachability problems arising from unbounded-
  *              thread program verification are of great practical importance,
@@ -51,18 +51,18 @@ int main(const int argc, const char * const * const argv) {
 			return 0;
 		}
 
-		Refs::OPT_PRINT_ADJ = cmd.arg_bool(cmd_line::prob_inst_opts(),
+		refs::OPT_PRINT_ADJ = cmd.arg_bool(cmd_line::prob_inst_opts(),
 				"--adj-list");
 
-		Refs::OPT_CONSTRAINT = cmd.arg_bool(cmd_line::exp_mode_opts(),
+		refs::OPT_CONSTRAINT = cmd.arg_bool(cmd_line::exp_mode_opts(),
 				"--constraint");
-		Refs::OPT_PRINT_ALL = cmd.arg_bool(cmd_line::other_opts(), "--all");
+		refs::OPT_PRINT_ALL = cmd.arg_bool(cmd_line::other_opts(), "--all");
 
 		const bool& is_self_loop = cmd.arg_bool(cmd_line::exp_mode_opts(),
 				"--self-loop");
 
 		if (cmd.arg_bool(cmd_line::other_opts(), "--cmd-line")
-				|| Refs::OPT_PRINT_ALL) {
+				|| refs::OPT_PRINT_ALL) {
 		}
 
 		const string& filename = cmd.arg_value(cmd_line::prob_inst_opts(),
@@ -76,7 +76,7 @@ int main(const int argc, const char * const * const argv) {
 		const bool& is_reachable = u.unbounded_reachability_analysis(filename,
 				initl_ts, final_ts, is_self_loop);
 		cout << "======================================================\n";
-		cout << " (" << Refs::S_FINAL_TS << ")";
+		cout << " (" << refs::S_FINAL_TS << ")";
 		if (is_reachable)
 			cout << " is reachable: verification failed!\n";
 		else

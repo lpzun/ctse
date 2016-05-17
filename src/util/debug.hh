@@ -27,10 +27,10 @@
 #  define DBG_LOC();
 #endif // DEBUG
 
-class Debug {
+class debugger {
 public:
-    Debug();
-    ~Debug();
+    debugger();
+    ~debugger();
 };
 
 #endif /* DEBUG_HH_ */

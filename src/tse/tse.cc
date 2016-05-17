@@ -77,7 +77,7 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out,
     cout << *iphi << "\n";
 #endif
 
-    if (Refs::OPT_CONSTRAINT) { /// output constraints
+    if (refs::OPT_CONSTRAINT) { /// output constraints
         cout << "(declare-fun " << n_0 << " () Int)" << "\n";
         for (uint idx = 0; idx < x_index; ++idx)
             cout << "(declare-fun " << x_affix << idx << " () Int)" << "\n";
@@ -96,14 +96,14 @@ result tse::solicit_for_TSE(const vector<inout>& l_in_out,
  * @return
  */
 vec_expr tse::build_CL(const vector<inout>& l_in_out) {
-    vec_expr phi(Thread_State::L, ctx.int_val(0));
-    phi[Refs::INITL_TS.get_local()] = n_0;
+    vec_expr phi(thread_state::L, ctx.int_val(0));
+    phi[refs::INITL_TS.get_local()] = n_0;
 
     for (size_t i = 0; i < l_in_out.size(); ++i) {
         expr lhs(ctx.int_val(0)); // left-hand		side
         expr rhs(ctx.int_val(0)); // right-hand 	side
-        if (i == Refs::FINAL_TS.get_local())
-            rhs = ctx.int_val(Refs::TARGET_THR_NUM);
+        if (i == refs::FINAL_TS.get_local())
+            rhs = ctx.int_val(refs::TARGET_THR_NUM);
 
         for (auto inc = l_in_out[i].first.begin();
                 inc != l_in_out[i].first.end(); ++inc)
@@ -125,11 +125,11 @@ vec_expr tse::build_CL(const vector<inout>& l_in_out) {
  * @return
  */
 vec_expr tse::build_CS(const vector<inout>& s_in_out) {
-    vec_expr phi(Thread_State::S, ctx.int_val(0));
+    vec_expr phi(thread_state::S, ctx.int_val(0));
 
-    if (Refs::INITL_TS.get_share() != Refs::FINAL_TS.get_share()) {
-        phi[Refs::INITL_TS.get_share()] = ctx.int_val(1);
-        phi[Refs::FINAL_TS.get_share()] = ctx.int_val(-1);
+    if (refs::INITL_TS.get_share() != refs::FINAL_TS.get_share()) {
+        phi[refs::INITL_TS.get_share()] = ctx.int_val(1);
+        phi[refs::FINAL_TS.get_share()] = ctx.int_val(-1);
     }
 
     for (size_t i = 0; i < s_in_out.size(); ++i) {
@@ -186,7 +186,7 @@ void tse::parse_sat_solution(const model& m) {
                 break;
     }
 
-    if (Refs::is_exists_SPAWN) {
+    if (refs::is_exists_SPAWN) {
         const auto z = get_z3_const_uint(m.eval(sum_z));
         if (max_z < z)
             max_z = z;
@@ -248,7 +248,7 @@ bool tse::solicit_for_CEGAR() {
  */
 bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
     /// if there is no spwan transitions, so call standard_FWS
-    if (!Refs::is_exists_SPAWN)
+    if (!refs::is_exists_SPAWN)
         return this->standard_FWS(n, z);
 
     /// enumeratively calling standard_FWS over (1, z) ... (n, ..., z)
@@ -279,23 +279,23 @@ bool tse::check_reach_with_fixed_threads(const uint& n, const uint& z) {
 bool tse::standard_FWS(const uint& n, const uint& z) {
     auto spw = z;
 //	cout << "fws: " << n << "               " << z << endl;
-    queue<Global_State, list<Global_State>> W; /// worklist
-    W.push(Global_State(Refs::INITL_TS, n)); /// start from the initial state with n threads
-    set<Global_State> R; /// reachable global states
+    queue<global_state, list<global_state>> W; /// worklist
+    W.push(global_state(refs::INITL_TS, n)); /// start from the initial state with n threads
+    set<global_state> R; /// reachable global states
     while (!W.empty()) {
-        Global_State tau = W.front();
+        global_state tau = W.front();
         W.pop();
         const ushort &shared = tau.get_share();
         for (auto il = tau.get_locals().begin(); il != tau.get_locals().end();
                 ++il) {
-            Thread_State src(shared, il->first);
-            if (src != Refs::FINAL_TS) {
-                auto ifind = Refs::original_TTD.find(src);
-                if (ifind != Refs::original_TTD.end()) {
+            thread_state src(shared, il->first);
+            if (src != refs::FINAL_TS) {
+                auto ifind = refs::original_TTD.find(src);
+                if (ifind != refs::original_TTD.end()) {
                     for (auto idst = ifind->second.begin();
                             idst != ifind->second.end(); ++idst) {
                         auto locals = tau.get_locals();
-                        if (Refs::is_exists_SPAWN
+                        if (refs::is_exists_SPAWN
                                 && this->is_spawn_transition(src, *idst)) { /// if src +> dst true
                             if (spw > 0) {
                                 spw--;
@@ -308,7 +308,7 @@ bool tse::standard_FWS(const uint& n, const uint& z) {
                             locals = this->update_counter(locals,
                                     src.get_local(), idst->get_local());
                         }
-                        Global_State _tau(idst->get_share(), locals);
+                        global_state _tau(idst->get_share(), locals);
                         if (R.insert(_tau).second) {
                             /// record _tau's predecessor tau: for witness
                             //_tau.pi = std::make_shared<Global_State>(tau);
@@ -389,10 +389,10 @@ map<ushort, ushort> tse::update_counter(const map<ushort, ushort> &Z,
  * 			true : src +> dst
  * 			false: otherwise
  */
-bool tse::is_spawn_transition(const Thread_State& src,
-        const Thread_State& dst) {
-    auto ifind = Refs::spawntra_TTD.find(src);
-    if (ifind == Refs::spawntra_TTD.end()) {
+bool tse::is_spawn_transition(const thread_state& src,
+        const thread_state& dst) {
+    auto ifind = refs::spawntra_TTD.find(src);
+    if (ifind == refs::spawntra_TTD.end()) {
         return false;
     } else {
         auto ifnd = std::find(ifind->second.begin(), ifind->second.end(), dst);

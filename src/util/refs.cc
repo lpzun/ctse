@@ -9,42 +9,42 @@
 
 namespace sura {
 
-Refs::Refs() {
+refs::refs() {
 
 }
 
-Refs::~Refs() {
+refs::~refs() {
 
 }
 
-bool Refs::OPT_SIMPLIFIED = false;
-bool Refs::OPT_NOT_SIMPLE = false;
+bool refs::OPT_SIMPLIFIED = false;
+bool refs::OPT_NOT_SIMPLE = false;
 
-bool Refs::IS_BWS_TREE = false;
-bool Refs::OPT_COMPLETE = false;
-bool Refs::OPT_BACKWARD = false;
-bool Refs::OPT_SHARED = false;
-bool Refs::OPT_PRINT_PATH = false;
-bool Refs::OPT_CONSTRAINT = false;
+bool refs::IS_BWS_TREE = false;
+bool refs::OPT_COMPLETE = false;
+bool refs::OPT_BACKWARD = false;
+bool refs::OPT_SHARED = false;
+bool refs::OPT_PRINT_PATH = false;
+bool refs::OPT_CONSTRAINT = false;
 
-bool Refs::OPT_PRINT_DOT = false;
-bool Refs::OPT_PRINT_ADJ = false;
-bool Refs::OPT_PRINT_CMD = false;
-bool Refs::OPT_PRINT_ALL = false;
+bool refs::OPT_PRINT_DOT = false;
+bool refs::OPT_PRINT_ADJ = false;
+bool refs::OPT_PRINT_CMD = false;
+bool refs::OPT_PRINT_ALL = false;
 
-ushort Refs::TARGET_THR_NUM = 1; /// default is 1
+ushort refs::TARGET_THR_NUM = 1; /// default is 1
 
 //string Refs::FILE_NAME_PREFIX = "";
-string Refs::S_FINAL_TS = "";
+string refs::S_FINAL_TS = "";
 
-Thread_State Refs::INITL_TS;
-Thread_State Refs::FINAL_TS;
+thread_state refs::INITL_TS;
+thread_state refs::FINAL_TS;
 
-adj_list Refs::original_TTD;
-adj_list Refs::spawntra_TTD;
+adj_list refs::original_TTD;
+adj_list refs::spawntra_TTD;
 
-bool Refs::is_exists_SPAWN = false;
+bool refs::is_exists_SPAWN = false;
 
-clock_t Refs::ELAPSED_TIME = clock();
+clock_t refs::ELAPSED_TIME = clock();
 
 } /* namespace SURA */

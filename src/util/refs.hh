@@ -12,12 +12,12 @@
 
 namespace sura {
 
-using adj_list = map<Thread_State, deque<Thread_State>>;
+using adj_list = map<thread_state, deque<thread_state>>;
 
-class Refs {
+class refs {
 public:
-	Refs();
-	~Refs();
+	refs();
+	~refs();
 
 	static bool OPT_PRINT_ALL;
 	static bool OPT_PRINT_DOT;
@@ -34,8 +34,8 @@ public:
 
 	static ushort TARGET_THR_NUM;
 
-	static Thread_State INITL_TS;
-	static Thread_State FINAL_TS;
+	static thread_state INITL_TS;
+	static thread_state FINAL_TS;
 
 	static string S_FINAL_TS;
 
