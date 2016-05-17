@@ -16,7 +16,6 @@ cmd_line::cmd_line() :
 }
 
 cmd_line::~cmd_line() {
-    // TODO Auto-generated destructor stub
 }
 
 /**
