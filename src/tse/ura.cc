@@ -1,4 +1,4 @@
-/*
+/**
  * ura.cc
  *
  *  Created on: Jul 28, 2015
@@ -10,12 +10,9 @@
 namespace sura {
 
 ura::ura() {
-    // TODO Auto-generated constructor stub
-
 }
 
 ura::~ura() {
-    // TODO Auto-generated destructor stub
 }
 
 /**
